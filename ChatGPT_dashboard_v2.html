@@ -1,0 +1,1289 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Yahoo 版位成效 Dashboard（離線）</title>
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#121a2f; --panel2:#0f1628;
+      --line:#243252; --text:#e8eefc; --muted:#a3b3d9;
+      --a:#4ade80; --b:#fbbf24; --c:#fb7185; --d:#60a5fa;
+      --chip:#1b2740; --r:14px; --shadow: 0 10px 26px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text)}
+    .app{display:grid;grid-template-columns:360px 1fr;min-height:100vh}
+    @media (max-width: 980px){.app{grid-template-columns:1fr}}
+    aside{border-right:1px solid rgba(36,50,82,.65);background:linear-gradient(180deg, rgba(18,26,47,.95), rgba(15,22,40,.95))}
+    main{background:radial-gradient(900px 600px at 10% -10%, rgba(96,165,250,.14), transparent 60%),
+                 radial-gradient(900px 600px at 90% 0%, rgba(74,222,128,.10), transparent 55%),
+                 var(--bg)}
+    .side{padding:16px 14px 18px; position:sticky; top:0; align-self:start; max-height:100vh; overflow:auto}
+    h1{font-size:16px;margin:0 0 8px}
+    .sub{font-size:12.5px;color:var(--muted);line-height:1.55}
+    .card{background:rgba(27,39,64,.22);border:1px solid rgba(36,50,82,.85);border-radius:var(--r);box-shadow:var(--shadow);padding:12px;margin-top:12px}
+    .card h2{font-size:13px;margin:0 0 10px;color:#dbe6ff}
+    .row{display:grid;gap:10px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+    input[type="number"],input[type="text"],input[type="date"],select,textarea{
+      width:100%; padding:9px 10px; border-radius:12px;
+      background:rgba(18,26,47,.55); color:var(--text);
+      border:1px solid rgba(36,50,82,.9); outline:none;
+      font-size:13px;
+    }
+    textarea{min-height:92px; resize:vertical; line-height:1.55}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap}
+    button,.btn{
+      background: rgba(96,165,250,.16);
+      border: 1px solid rgba(96,165,250,.36);
+      color:var(--text);
+      padding:9px 12px;border-radius:12px;cursor:pointer;font-size:13px
+    }
+    button:hover,.btn:hover{filter:brightness(1.06)}
+    button:disabled{opacity:.55;cursor:not-allowed}
+    input[type="file"]{display:none}
+    .small{font-size:12px;color:var(--muted);line-height:1.55;white-space:pre-line}
+    .warn{border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.10);border-radius:12px;padding:10px 10px;color:#ffe9b0;font-size:12.5px;line-height:1.55}
+    .ok{border:1px solid rgba(74,222,128,.35);background:rgba(74,222,128,.10);border-radius:12px;padding:10px 10px;color:#dfffe9;font-size:12.5px;line-height:1.55}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px 0}
+    .tab{padding:8px 10px;border-radius:999px;border:1px solid rgba(36,50,82,.9);
+         background:rgba(27,39,64,.22);color:var(--muted);cursor:pointer;font-size:12.5px}
+    .tab.active{background:rgba(96,165,250,.18);border-color:rgba(96,165,250,.38);color:var(--text)}
+    .view{padding:12px 16px 18px}
+    .kpis{display:grid;gap:10px;grid-template-columns:repeat(4,1fr)}
+    @media (max-width: 980px){.kpis{grid-template-columns:repeat(2,1fr)}}
+    .kpi{background:rgba(27,39,64,.22);border:1px solid rgba(36,50,82,.85);border-radius:var(--r);padding:10px 12px}
+    .kpi .t{color:var(--muted);font-size:12px}
+    .kpi .v{font-family:var(--mono);font-size:16px;margin-top:6px}
+    .kpi .s{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.45}
+    .grid2{display:grid;gap:12px;grid-template-columns:1.2fr .8fr}
+    @media (max-width: 980px){.grid2{grid-template-columns:1fr}}
+    .panel{background:rgba(27,39,64,.18);border:1px solid rgba(36,50,82,.85);border-radius:var(--r);padding:12px}
+    .panel h3{margin:0 0 8px;font-size:13px;color:#dbe6ff}
+    .bars .bar{display:flex;align-items:center;gap:10px;margin:8px 0}
+    .bars .name{flex:0 0 42%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;color:#dbe6ff}
+    .bars .track{flex:1;height:10px;border-radius:999px;background:rgba(163,179,217,.12);overflow:hidden}
+    .bars .fill{height:100%;border-radius:999px;background:rgba(96,165,250,.65)}
+    .bars .val{flex:0 0 70px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--muted)}
+    canvas{width:100%;height:280px;background:rgba(27,39,64,.12);border:1px solid rgba(36,50,82,.85);border-radius:var(--r)}
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid rgba(36,50,82,.85);border-radius:var(--r);overflow:hidden;background:rgba(27,39,64,.12)}
+    th,td{padding:9px 10px;border-bottom:1px solid rgba(36,50,82,.55);font-size:12.5px;vertical-align:top}
+    th{position:sticky;top:0;background:rgba(18,26,47,.8);color:#dbe6ff;text-align:left}
+    tr:last-child td{border-bottom:none}
+    .pill{display:inline-flex;align-items:center;justify-content:center;min-width:30px;padding:2px 8px;border-radius:999px;font-weight:800;font-size:12px;border:1px solid rgba(255,255,255,.12)}
+    .A{color:#052e14;background:rgba(74,222,128,.18);border-color:rgba(74,222,128,.35)}
+    .B{color:#3b2a00;background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.35)}
+    .C{color:#4c0519;background:rgba(251,113,133,.16);border-color:rgba(251,113,133,.35)}
+    .D{color:#0b2a4a;background:rgba(96,165,250,.14);border-color:rgba(96,165,250,.32)}
+    .muted{color:var(--muted)}
+    .right{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+    .mono{font-family:var(--mono)}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="side">
+        <h1>Yahoo 版位成效 Dashboard（離線）</h1>
+        <div class="sub">上傳 Yahoo 報表後，依你選的「主分析欄位（版位/Creative/Line item）」自動彙總、分級（A/B/C/D）、並產出可貼給媒體的一句話指示。所有運算都在本機瀏覽器完成。</div>
+
+        <div class="card">
+          <h2>1) 上傳檔案</h2>
+          <div class="btnRow">
+            <label class="btn" for="fileInput">選擇檔案（CSV/TSV）</label>
+            <input id="fileInput" type="file" accept=".csv,.tsv,text/csv,text/tab-separated-values" multiple />
+            <button id="btnClear" type="button" disabled>清空</button>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <div>
+              <label>檔案編碼</label>
+              <select id="encoding">
+                <option value="auto" selected>自動（Auto）</option>
+                <option value="utf-8">UTF-8</option>
+                <option value="big5">Big5</option>
+                <option value="utf-16le">UTF-16LE（Excel 常見）</option>
+              </select>
+              <div class="small">若中文亂碼，請改 Big5 或 UTF-16LE 再按「重新讀取」。</div>
+            </div>
+            <div>
+              <label>合併方式</label>
+              <select id="mergeMode">
+                <option value="merge" selected>合併所有檔案（同版位/同維度加總）</option>
+                <option value="separate">逐檔檢視（每檔獨立）</option>
+              </select>
+            </div>
+          </div>
+          <div class="btnRow" style="margin-top:10px">
+            <button id="btnReload" type="button" disabled>重新讀取（更新欄位下拉）</button>
+            <button id="btnAnalyze" type="button" disabled>分析</button>
+          </div>
+          <div class="small" id="fileList" style="margin-top:10px">尚未選擇檔案。</div>
+        </div>
+
+        <div class="card">
+          <h2>2) 欄位設定（全部欄位皆可下拉）</h2>
+          <div class="row">
+            <div>
+              <label>主分析欄位（版位/Creative/Line item 皆可）</label>
+              <select id="selDim"></select>
+              <div class="small">你要分析「版位」但報表沒有 Placement 欄位時，通常選 Creative 或 Line item。</div>
+            </div>
+            <div>
+              <label>日期欄位（走期/趨勢用）</label>
+              <select id="selDate"></select>
+            </div>
+            <div>
+              <label>曝光欄位</label>
+              <select id="selImp"></select>
+            </div>
+            <div>
+              <label>點擊欄位</label>
+              <select id="selClk"></select>
+            </div>
+            <div>
+              <label>裝置欄位（可選）</label>
+              <select id="selDevice"></select>
+            </div>
+
+            <div class="warn" id="mapWarn" style="display:none"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>3) 分級門檻（可調）</h2>
+          <div class="row">
+            <div class="row" style="grid-template-columns:1fr 1fr">
+              <div>
+                <label>最小曝光（< → D）</label>
+                <input id="minImp" type="number" value="300" min="0" step="10" />
+              </div>
+              <div>
+                <label>C 判斷曝光（CTR=0 且 ≥）</label>
+                <input id="cImp" type="number" value="1000" min="0" step="10" />
+              </div>
+            </div>
+            <div class="row" style="grid-template-columns:1fr 1fr">
+              <div>
+                <label>A 級 CTR（%）≥</label>
+                <input id="aCtr" type="number" value="0.5" min="0" step="0.05" />
+              </div>
+              <div>
+                <label>B 級 CTR（%）≥</label>
+                <input id="bCtr" type="number" value="0.1" min="0" step="0.05" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>4) 篩選</h2>
+          <div class="row">
+            <div>
+              <label>主分析欄位包含關鍵字（可空白）</label>
+              <input id="fltText" type="text" placeholder="例如：lighthouse / 300x250 / PC / Mobile" />
+            </div>
+            <div class="row" style="grid-template-columns:1fr 1fr">
+              <div>
+                <label>日期起（可空白）</label>
+                <input id="fltDateFrom" type="date" />
+              </div>
+              <div>
+                <label>日期迄（可空白）</label>
+                <input id="fltDateTo" type="date" />
+              </div>
+            </div>
+            <div>
+              <label>裝置過濾（可空白）</label>
+              <select id="fltDevice"></select>
+              <div class="small">若報表無裝置欄位，會用主分析欄位文字猜測（可能不準）。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>5) 匯出</h2>
+          <div class="btnRow">
+            <button id="btnCopyTSV" disabled>複製 TSV（貼到 Sheets）</button>
+            <button id="btnDownloadCSV" disabled>下載建議表 CSV</button>
+          </div>
+          <div class="btnRow" style="margin-top:10px">
+            <button id="btnCopyMediaLine" disabled>複製媒體一句話指示</button>
+          </div>
+          <div class="small" style="margin-top:10px">
+            若瀏覽器禁止剪貼簿（常見於 file://），請用下方文字框手動複製。
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="tabs">
+        <div class="tab active" data-view="overview">總覽</div>
+        <div class="tab" data-view="trend">趨勢（曲線）</div>
+        <div class="tab" data-view="table">表格（版位/主維度）</div>
+      </div>
+
+      <section class="view" id="view-overview">
+        <div class="kpis">
+          <div class="kpi"><div class="t">走期</div><div class="v" id="kpiFlight">—</div><div class="s" id="kpiFlightS">—</div></div>
+          <div class="kpi"><div class="t">總曝光</div><div class="v mono" id="kpiImp">—</div><div class="s" id="kpiImpS">—</div></div>
+          <div class="kpi"><div class="t">總點擊</div><div class="v mono" id="kpiClk">—</div><div class="s" id="kpiClkS">—</div></div>
+          <div class="kpi"><div class="t">加權 CTR</div><div class="v mono" id="kpiCtr">—</div><div class="s" id="kpiCtrS">—</div></div>
+        </div>
+
+        <div class="grid2" style="margin-top:12px">
+          <div class="panel">
+            <h3>Top 10（依點擊）</h3>
+            <div class="bars" id="topBars"></div>
+          </div>
+          <div class="panel">
+            <h3>自動摘要</h3>
+            <div id="summaryBox" class="ok" style="display:none"></div>
+            <div class="warn" id="limitBox">
+              <b>限制提醒（ROAS）</b><br/>
+              若報表未含成本/轉換價值，本工具無法計算 ROAS；此處以 CTR 作為行為代理指標。若你要做 ROAS/CPA，請補上 Spend/Cost + Conversion/Value 欄位並再擴充分析。
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px">
+          <h3>給媒體/內部的一句話指示（自動生成）</h3>
+          <textarea id="mediaLine" placeholder="分析完成後自動生成"></textarea>
+        </div>
+      </section>
+
+      <section class="view" id="view-trend" style="display:none">
+        <div class="panel">
+          <div class="row" style="grid-template-columns: 1fr 240px; align-items:end">
+            <div>
+              <h3 style="margin-bottom:6px">趨勢曲線</h3>
+              <div class="small">需要「日期欄位」才能出現曲線；若資料只有彙總，請在左側把日期欄位選成「（無）」。</div>
+            </div>
+            <div>
+              <label>曲線指標</label>
+              <select id="trendMetric">
+                <option value="ctr" selected>CTR（加權）</option>
+                <option value="clicks">Clicks（點擊）</option>
+                <option value="impressions">Impressions（曝光）</option>
+              </select>
+            </div>
+          </div>
+          <canvas id="trendCanvas" width="1000" height="320"></canvas>
+          <div class="small" id="trendHint" style="margin-top:8px"></div>
+        </div>
+
+        <div class="panel" style="margin-top:12px; max-height:440px; overflow:auto">
+          <h3>每日彙總（用於對照曲線）</h3>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:140px">日期</th>
+                <th class="mono" style="width:140px">曝光</th>
+                <th class="mono" style="width:140px">點擊</th>
+                <th class="mono" style="width:140px">CTR</th>
+              </tr>
+            </thead>
+            <tbody id="trendTableBody">
+              <tr><td colspan="4" class="muted">尚未分析。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="view" id="view-table" style="display:none">
+        <div class="panel">
+          <div class="row" style="grid-template-columns: 1fr 180px 180px; align-items:end">
+            <div>
+              <h3 style="margin-bottom:6px">主分析表（分級＋建議）</h3>
+              <div class="small">此表為「可貼給媒體/內部」的核心輸出。若要更激進淘汰長尾版位：提高 A/B 門檻或降低最小曝光門檻。</div>
+            </div>
+            <div>
+              <label>排序依據</label>
+              <select id="sortBy">
+                <option value="clicks" selected>點擊（Clicks）</option>
+                <option value="ctr">CTR</option>
+                <option value="impressions">曝光（Impressions）</option>
+              </select>
+            </div>
+            <div>
+              <label>顯示筆數</label>
+              <select id="limitRows">
+                <option value="50" selected>50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="999999">全部</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:12px; max-height:620px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:64px">分級</th>
+                <th>主分析值</th>
+                <th style="width:110px">裝置</th>
+                <th class="mono" style="width:120px">曝光</th>
+                <th class="mono" style="width:120px">點擊</th>
+                <th class="mono" style="width:110px">CTR</th>
+                <th class="mono" style="width:110px">點擊佔比</th>
+                <th style="width:160px">建議動作</th>
+              </tr>
+            </thead>
+            <tbody id="mainTableBody">
+              <tr><td colspan="8" class="muted">尚未分析。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+/* ========== Helpers ========== */
+function normalizeHeader(h){
+  return String(h ?? "")
+    .trim().toLowerCase()
+    .replace(/[\u3000]/g," ")
+    .replace(/\s+/g," ")
+    .replace(/[()\[\]{}%]/g,"")
+    .replace(/\./g,"")
+    .replace(/\//g," ")
+    .replace(/_/g," ")
+    .replace(/-/g," ");
+}
+function toNumber(v){
+  if (v === null || v === undefined) return NaN;
+  const s = String(v).trim().replace(/,/g,"");
+  if (s === "") return NaN;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+function fmtInt(n){
+  if (!Number.isFinite(n)) return "—";
+  return Math.round(n).toLocaleString("zh-Hant");
+}
+function pct(v){
+  if (!Number.isFinite(v)) return "—";
+  return (v*100).toFixed(2) + "%";
+}
+function safeDiv(a,b){
+  if (!Number.isFinite(a) || !Number.isFinite(b) || b===0) return 0;
+  return a/b;
+}
+function guessDevice(text){
+  const s = String(text || "").toLowerCase();
+  if (/(mobile|mweb|app|android|ios)/.test(s)) return "Mobile";
+  if (/(desktop|pc|dweb|web)/.test(s)) return "PC";
+  if (/(手機|行動|m版)/.test(s)) return "Mobile";
+  if (/(桌機|電腦|pc版)/.test(s)) return "PC";
+  return "—";
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function copyText(text){
+  // Clipboard API may be blocked under file:// ; provide fallback
+  const t = String(text ?? "");
+  if (!t) return Promise.resolve(false);
+
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(t).then(()=>true).catch(()=>fallbackCopy(t));
+  }
+  return Promise.resolve(fallbackCopy(t));
+}
+function fallbackCopy(t){
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = t;
+    ta.setAttribute("readonly","");
+    ta.style.position="fixed";
+    ta.style.left="-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  }catch(e){ return false; }
+}
+
+/* ========== Delimited parser (CSV/TSV/; etc.) ========== */
+function detectDelimiter(sampleLine){
+  const delims = [",","\t",";","|"];
+  const counts = new Map(delims.map(d => [d,0]));
+  let inQuotes = false;
+  for (let i=0;i<sampleLine.length;i++){
+    const ch = sampleLine[i];
+    const next = sampleLine[i+1];
+    if (ch === '"' && next === '"'){ i++; continue; }
+    if (ch === '"'){ inQuotes = !inQuotes; continue; }
+    if (!inQuotes && counts.has(ch)) counts.set(ch, counts.get(ch)+1);
+  }
+  let best = ","; let bestCount = -1;
+  for (const [d,c] of counts.entries()){
+    if (c > bestCount){ bestCount = c; best = d; }
+  }
+  return best;
+}
+function parseDelimited(text, delimiter){
+  text = text.replace(/\r\n/g,"\n").replace(/\r/g,"\n");
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+
+  const rows = [];
+  let row = [];
+  let cur = "";
+  let inQuotes = false;
+
+  for (let i=0;i<text.length;i++){
+    const ch = text[i];
+    const next = text[i+1];
+    if (inQuotes){
+      if (ch === '"' && next === '"'){ cur += '"'; i++; }
+      else if (ch === '"'){ inQuotes = false; }
+      else { cur += ch; }
+    } else {
+      if (ch === '"'){ inQuotes = true; }
+      else if (ch === delimiter){ row.push(cur); cur=""; }
+      else if (ch === "\n"){ row.push(cur); rows.push(row); row=[]; cur=""; }
+      else { cur += ch; }
+    }
+  }
+  row.push(cur); rows.push(row);
+  while (rows.length && rows[rows.length-1].every(v => String(v).trim()==="")) rows.pop();
+  return rows;
+}
+function parseAnyDelimited(text){
+  const firstLine = (text.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n").find(l => l.trim() !== "") || "");
+  const delimiter = detectDelimiter(firstLine);
+  return parseDelimited(text, delimiter);
+}
+
+/* ========== Date handling ========== */
+function parseDateAny(v){
+  if (v === null || v === undefined) return null;
+  const s0 = String(v).trim();
+  if (!s0) return null;
+
+  // YYYY/MM/DD or YYYY/M/D
+  const s = s0.replace(/\./g,"/").replace(/-/g,"/").replace(/\s+/g,"");
+  const m1 = s.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);
+  if (m1){
+    const y = Number(m1[1]), mo = Number(m1[2]), d = Number(m1[3]);
+    if (y>=1900 && mo>=1 && mo<=12 && d>=1 && d<=31){
+      return {y,mo,d, key: `${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`};
+    }
+  }
+  // YYYYMMDD
+  const m2 = s0.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if (m2){
+    const y = Number(m2[1]), mo=Number(m2[2]), d=Number(m2[3]);
+    return {y,mo,d, key: `${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`};
+  }
+  return null;
+}
+function dateKeyToDateInput(key){
+  // YYYY-MM-DD
+  return key;
+}
+function compareDateKey(a,b){
+  // lexicographic works for YYYY-MM-DD
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
+/* ========== Column detection ========== */
+function pickNorm(normList, candidates){
+  for (const c of candidates){
+    const idx = normList.findIndex(h => h === c || h.includes(c));
+    if (idx >= 0) return idx;
+  }
+  return -1;
+}
+function detectDefaults(options){
+  // options: [{norm,label}]
+  const normList = options.map(o => o.norm);
+  const dimIdx = pickNorm(normList, ["placement","placement name","ad slot","slot","inventory","creative","line item","版位","版位名稱"]);
+  const dateIdx = pickNorm(normList, ["date","日期","day"]);
+  const impIdx = pickNorm(normList, ["total impressions","impressions","impression","曝光"]);
+  const clkIdx = pickNorm(normList, ["total clicks","clicks","click","點擊","總點擊"]);
+  const devIdx = pickNorm(normList, ["device","裝置","platform","device type"]);
+  return {dimIdx,dateIdx,impIdx,clkIdx,devIdx};
+}
+
+/* ========== State ========== */
+let rawFiles = [];
+let parsedFiles = []; // [{name, headers, rows, normToIndex, normHeaders}]
+let headerOptions = []; // [{norm,label}]
+let last = null; // {mainRows, trendRows, summary, exports}
+
+const els = {
+  fileInput: document.getElementById("fileInput"),
+  fileList: document.getElementById("fileList"),
+  btnClear: document.getElementById("btnClear"),
+  btnReload: document.getElementById("btnReload"),
+  btnAnalyze: document.getElementById("btnAnalyze"),
+  encoding: document.getElementById("encoding"),
+  mergeMode: document.getElementById("mergeMode"),
+
+  selDim: document.getElementById("selDim"),
+  selDate: document.getElementById("selDate"),
+  selImp: document.getElementById("selImp"),
+  selClk: document.getElementById("selClk"),
+  selDevice: document.getElementById("selDevice"),
+  mapWarn: document.getElementById("mapWarn"),
+
+  minImp: document.getElementById("minImp"),
+  cImp: document.getElementById("cImp"),
+  aCtr: document.getElementById("aCtr"),
+  bCtr: document.getElementById("bCtr"),
+
+  fltText: document.getElementById("fltText"),
+  fltDateFrom: document.getElementById("fltDateFrom"),
+  fltDateTo: document.getElementById("fltDateTo"),
+  fltDevice: document.getElementById("fltDevice"),
+
+  kpiFlight: document.getElementById("kpiFlight"),
+  kpiFlightS: document.getElementById("kpiFlightS"),
+  kpiImp: document.getElementById("kpiImp"),
+  kpiImpS: document.getElementById("kpiImpS"),
+  kpiClk: document.getElementById("kpiClk"),
+  kpiClkS: document.getElementById("kpiClkS"),
+  kpiCtr: document.getElementById("kpiCtr"),
+  kpiCtrS: document.getElementById("kpiCtrS"),
+
+  topBars: document.getElementById("topBars"),
+  summaryBox: document.getElementById("summaryBox"),
+  mediaLine: document.getElementById("mediaLine"),
+
+  trendMetric: document.getElementById("trendMetric"),
+  trendCanvas: document.getElementById("trendCanvas"),
+  trendHint: document.getElementById("trendHint"),
+  trendTableBody: document.getElementById("trendTableBody"),
+
+  sortBy: document.getElementById("sortBy"),
+  limitRows: document.getElementById("limitRows"),
+  mainTableBody: document.getElementById("mainTableBody"),
+
+  btnCopyTSV: document.getElementById("btnCopyTSV"),
+  btnDownloadCSV: document.getElementById("btnDownloadCSV"),
+  btnCopyMediaLine: document.getElementById("btnCopyMediaLine"),
+};
+
+/* ========== Encoding reader ========== */
+async function readFileWithEncoding(file, encoding){
+  const buf = await file.arrayBuffer();
+  const u8 = new Uint8Array(buf);
+  const hasUTF16LEBOM = u8.length >= 2 && u8[0] === 0xFF && u8[1] === 0xFE;
+  const hasUTF16BEBOM = u8.length >= 2 && u8[0] === 0xFE && u8[1] === 0xFF;
+
+  const encs = [];
+  if (encoding === "auto"){
+    if (hasUTF16LEBOM) encs.push("utf-16le");
+    if (hasUTF16BEBOM) encs.push("utf-16be");
+    encs.push("utf-8","utf-16le","big5");
+  } else {
+    encs.push(encoding);
+  }
+
+  for (const enc of encs){
+    try{
+      const td = new TextDecoder(enc, {fatal:false});
+      const txt = td.decode(buf);
+      const repl = (txt.match(/\uFFFD/g) || []).length;
+      const nuls = (txt.match(/\x00/g) || []).length;
+      if (encoding === "auto"){
+        if (nuls > 10) continue;
+        if (repl > 10) continue;
+      }
+      return txt;
+    }catch(e){}
+  }
+  return new TextDecoder("utf-8", {fatal:false}).decode(buf);
+}
+
+/* ========== UI: header options ========== */
+function setSelectOptions(sel, options, placeholder, allowNone=false){
+  sel.innerHTML = "";
+  if (allowNone){
+    const o0 = document.createElement("option");
+    o0.value = "__none__";
+    o0.textContent = "（無）";
+    sel.appendChild(o0);
+  }
+  const op = document.createElement("option");
+  op.value = "__pick__";
+  op.textContent = placeholder;
+  sel.appendChild(op);
+
+  for (const o of options){
+    const opt = document.createElement("option");
+    opt.value = o.norm;
+    opt.textContent = o.label;
+    sel.appendChild(opt);
+  }
+}
+
+function setDeviceFilterOptions(){
+  const sel = els.fltDevice;
+  sel.innerHTML = "";
+  const opt0 = document.createElement("option");
+  opt0.value = "";
+  opt0.textContent = "（不過濾）";
+  sel.appendChild(opt0);
+  ["Mobile","PC","—"].forEach(v => {
+    const o = document.createElement("option");
+    o.value = v;
+    o.textContent = v;
+    sel.appendChild(o);
+  });
+}
+
+function setDefaultSelections(){
+  const defs = detectDefaults(headerOptions);
+
+  // Dimension: prefer Creative/Line item if placement not found
+  const dimNorm = (defs.dimIdx>=0) ? headerOptions[defs.dimIdx].norm : (headerOptions[0]?.norm || "__none__");
+  const dateNorm = (defs.dateIdx>=0) ? headerOptions[defs.dateIdx].norm : "__none__";
+  const impNorm = (defs.impIdx>=0) ? headerOptions[defs.impIdx].norm : "__pick__";
+  const clkNorm = (defs.clkIdx>=0) ? headerOptions[defs.clkIdx].norm : "__pick__";
+  const devNorm = (defs.devIdx>=0) ? headerOptions[defs.devIdx].norm : "__none__";
+
+  els.selDim.value = dimNorm;
+  els.selDate.value = dateNorm;
+  els.selImp.value = impNorm;
+  els.selClk.value = clkNorm;
+  els.selDevice.value = devNorm;
+}
+
+/* ========== Parsing and preparation ========== */
+function buildHeaderOptionsFromParsed(parsedFiles){
+  const map = new Map(); // norm -> label
+  for (const pf of parsedFiles){
+    pf.headers.forEach((h,i) => {
+      const norm = normalizeHeader(h);
+      if (!norm) return;
+      if (!map.has(norm)) map.set(norm, h);
+    });
+  }
+  headerOptions = Array.from(map.entries()).map(([norm,label]) => ({norm,label}));
+  headerOptions.sort((a,b) => a.label.localeCompare(b.label,"zh-Hant"));
+}
+
+async function parseAllFiles(){
+  parsedFiles = [];
+  if (!rawFiles.length) return;
+
+  const enc = els.encoding.value;
+  for (const f of rawFiles){
+    const txt = await readFileWithEncoding(f, enc);
+    const arr = parseAnyDelimited(txt);
+    if (!arr || arr.length < 2) continue;
+    const headers = (arr[0] || []).map(h => String(h ?? "").trim());
+    const rows = arr.slice(1);
+    const normHeaders = headers.map(h => normalizeHeader(h));
+    const normToIndex = new Map();
+    normHeaders.forEach((nh, i) => { if (nh && !normToIndex.has(nh)) normToIndex.set(nh, i); });
+    parsedFiles.push({name:f.name, headers, rows, normHeaders, normToIndex});
+  }
+
+  if (!parsedFiles.length){
+    els.fileList.textContent = "無法解析任何檔案。請確認格式，或更換編碼後重試。";
+    return;
+  }
+
+  buildHeaderOptionsFromParsed(parsedFiles);
+
+  // Populate selects (all columns)
+  setSelectOptions(els.selDim, headerOptions, "請選擇主分析欄位");
+  setSelectOptions(els.selDate, headerOptions, "（選填）請選擇日期欄位", true);
+  setSelectOptions(els.selImp, headerOptions, "請選擇曝光欄位");
+  setSelectOptions(els.selClk, headerOptions, "請選擇點擊欄位");
+  setSelectOptions(els.selDevice, headerOptions, "（選填）請選擇裝置欄位", true);
+
+  setDeviceFilterOptions();
+  setDefaultSelections();
+
+  els.btnAnalyze.disabled = false;
+  els.mapWarn.style.display = "none";
+}
+
+/* ========== Analysis ========== */
+function computeGrade(imp, ctr, th){
+  if (imp < th.minImp) return "D";
+  if (ctr === 0 && imp >= th.cImp) return "C";
+  if (ctr >= th.aCtr) return "A";
+  if (ctr >= th.bCtr) return "B";
+  return "C";
+}
+function actionForGrade(g){
+  if (g === "A") return "保留＋優先加碼（主力）";
+  if (g === "B") return "保留觀察（維持）";
+  if (g === "C") return "降權或排除（避免稀釋）";
+  return "不評估（樣本過小）";
+}
+
+function applyFilters(dimValue, deviceValue, dateKey){
+  const text = els.fltText.value.trim().toLowerCase();
+  if (text){
+    if (!String(dimValue || "").toLowerCase().includes(text)) return false;
+  }
+
+  const devFilter = els.fltDevice.value;
+  if (devFilter){
+    if (String(deviceValue || "—") !== devFilter) return false;
+  }
+
+  const from = els.fltDateFrom.value;
+  const to = els.fltDateTo.value;
+  if ((from || to) && dateKey){
+    if (from && dateKey < from) return false;
+    if (to && dateKey > to) return false;
+  }
+  return true;
+}
+
+function analyze(){
+  if (!parsedFiles.length) return null;
+
+  const dimNorm = els.selDim.value;
+  const dateNorm = els.selDate.value;
+  const impNorm = els.selImp.value;
+  const clkNorm = els.selClk.value;
+  const devNorm = els.selDevice.value;
+
+  const missing = [];
+  if (!dimNorm || dimNorm === "__pick__") missing.push("主分析欄位");
+  if (!impNorm || impNorm === "__pick__") missing.push("曝光欄位");
+  if (!clkNorm || clkNorm === "__pick__") missing.push("點擊欄位");
+  if (missing.length){
+    els.mapWarn.style.display = "block";
+    els.mapWarn.innerHTML = `<b>欄位未設定完整：</b>${missing.join("、")}。請在左側選擇。`;
+    return null;
+  }
+  els.mapWarn.style.display = "none";
+
+  const th = {
+    minImp: Number(els.minImp.value || 0),
+    cImp: Number(els.cImp.value || 0),
+    aCtr: Number(els.aCtr.value || 0)/100,
+    bCtr: Number(els.bCtr.value || 0)/100
+  };
+  const mergeMode = els.mergeMode.value;
+
+  const agg = new Map(); // key -> {file, dim, device, imp, clk}
+  const trend = new Map(); // dateKey -> {imp, clk}
+
+  const warnings = {missingCols:0, skippedRows:0, usedRows:0};
+
+  let flightMin = null, flightMax = null;
+
+  for (const pf of parsedFiles){
+    const dimIdx = pf.normToIndex.get(dimNorm);
+    const impIdx = pf.normToIndex.get(impNorm);
+    const clkIdx = pf.normToIndex.get(clkNorm);
+    const dateIdx = (dateNorm && dateNorm !== "__none__") ? pf.normToIndex.get(dateNorm) : undefined;
+    const devIdx = (devNorm && devNorm !== "__none__") ? pf.normToIndex.get(devNorm) : undefined;
+
+    if (dimIdx === undefined || impIdx === undefined || clkIdx === undefined){
+      warnings.missingCols += 1;
+      continue;
+    }
+
+    for (const r of pf.rows){
+      const dimValue = String(r[dimIdx] ?? "").trim();
+      if (!dimValue){ warnings.skippedRows += 1; continue; }
+
+      const imp = toNumber(r[impIdx]);
+      const clk = toNumber(r[clkIdx]);
+
+      if (!Number.isFinite(imp) && !Number.isFinite(clk)){ warnings.skippedRows += 1; continue; }
+
+      let dateKey = null;
+      if (dateIdx !== undefined){
+        const d = parseDateAny(r[dateIdx]);
+        if (d) dateKey = d.key;
+      }
+
+      let device = "—";
+      if (devIdx !== undefined){
+        device = String(r[devIdx] ?? "").trim() || "—";
+      } else {
+        // fallback: guess from dimValue
+        device = guessDevice(dimValue);
+      }
+
+      if (!applyFilters(dimValue, device, dateKey)){ continue; }
+
+      warnings.usedRows += 1;
+
+      // flight
+      if (dateKey){
+        if (!flightMin || dateKey < flightMin) flightMin = dateKey;
+        if (!flightMax || dateKey > flightMax) flightMax = dateKey;
+      }
+
+      // trend aggregation (date required)
+      if (dateKey){
+        if (!trend.has(dateKey)) trend.set(dateKey, {dateKey, impressions:0, clicks:0});
+        const t = trend.get(dateKey);
+        if (Number.isFinite(imp)) t.impressions += imp;
+        if (Number.isFinite(clk)) t.clicks += clk;
+      }
+
+      // main aggregation
+      const fileTag = (mergeMode === "merge") ? "（合併）" : pf.name;
+      const key = (mergeMode === "merge") ? `${dimValue}||${device}` : `${pf.name}||${dimValue}||${device}`;
+
+      if (!agg.has(key)){
+        agg.set(key, {file:fileTag, dimValue, device, impressions:0, clicks:0});
+      }
+      const o = agg.get(key);
+      if (Number.isFinite(imp)) o.impressions += imp;
+      if (Number.isFinite(clk)) o.clicks += clk;
+    }
+  }
+
+  const mainRows = Array.from(agg.values()).map(o => {
+    const ctr = safeDiv(o.clicks, o.impressions);
+    return {
+      ...o,
+      ctr,
+      grade: computeGrade(o.impressions, ctr, th),
+      action: null,
+      clickShare: 0
+    };
+  });
+
+  const totalImp = mainRows.reduce((s,r)=>s+(Number.isFinite(r.impressions)?r.impressions:0),0);
+  const totalClk = mainRows.reduce((s,r)=>s+(Number.isFinite(r.clicks)?r.clicks:0),0);
+  const weightedCtr = safeDiv(totalClk, totalImp);
+
+  mainRows.forEach(r => {
+    r.clickShare = safeDiv(r.clicks, totalClk);
+    r.action = actionForGrade(r.grade);
+  });
+
+  const counts = {A:0,B:0,C:0,D:0};
+  mainRows.forEach(r => counts[r.grade] = (counts[r.grade]||0)+1);
+
+  // top click concentration
+  mainRows.sort((a,b) => (b.clicks - a.clicks) || (b.impressions - a.impressions));
+  const topN = Math.max(1, Math.ceil(mainRows.length * 0.2));
+  const topClicks = mainRows.slice(0, topN).reduce((s,r)=>s+r.clicks,0);
+  const topClickShare = safeDiv(topClicks, totalClk);
+
+  // zero CTR and big impressions
+  const zeroLargeCount = mainRows.filter(r => r.ctr === 0 && r.impressions >= th.cImp).length;
+
+  // trend rows
+  const trendRows = Array.from(trend.values()).map(t => {
+    const ctr = safeDiv(t.clicks, t.impressions);
+    return {...t, ctr};
+  }).sort((a,b) => compareDateKey(a.dateKey, b.dateKey));
+
+  return {
+    mainRows,
+    trendRows,
+    summary: {
+      totalImp, totalClk, weightedCtr,
+      placements: mainRows.length,
+      counts,
+      zeroLargeCount,
+      topN, topClickShare,
+      flightMin, flightMax,
+      warnings,
+      thresholds: th
+    }
+  };
+}
+
+/* ========== Rendering ========== */
+function setKpis(sum){
+  // flight
+  if (sum.flightMin && sum.flightMax){
+    els.kpiFlight.textContent = `${sum.flightMin} ~ ${sum.flightMax}`;
+    // compute days
+    els.kpiFlightS.textContent = "（以資料日期欄位推算）";
+    // set filter defaults if empty
+    if (!els.fltDateFrom.value) els.fltDateFrom.value = sum.flightMin;
+    if (!els.fltDateTo.value) els.fltDateTo.value = sum.flightMax;
+  } else {
+    els.kpiFlight.textContent = "—";
+    els.kpiFlightS.textContent = "（未提供日期欄位或無可解析日期）";
+  }
+
+  els.kpiImp.textContent = fmtInt(sum.totalImp);
+  els.kpiClk.textContent = fmtInt(sum.totalClk);
+  els.kpiCtr.textContent = pct(sum.weightedCtr);
+
+  els.kpiImpS.textContent = `主維度數：${fmtInt(sum.placements)}；A/B/C/D：${sum.counts.A||0}/${sum.counts.B||0}/${sum.counts.C||0}/${sum.counts.D||0}`;
+  els.kpiClkS.textContent = `前${sum.topN}項點擊佔比：${pct(sum.topClickShare)}`;
+  els.kpiCtrS.textContent = `大曝光零點擊（≥C門檻且CTR=0）：${fmtInt(sum.zeroLargeCount)}`;
+}
+
+function renderTopBars(rows){
+  const top = rows.slice(0,10);
+  const max = Math.max(...top.map(r => r.clicks), 1);
+  els.topBars.innerHTML = "";
+  top.forEach(r => {
+    const div = document.createElement("div");
+    div.className = "bar";
+    div.innerHTML = `
+      <div class="name" title="${escapeHtml(r.dimValue)}">${escapeHtml(r.dimValue)}</div>
+      <div class="track"><div class="fill" style="width:${Math.max(2,(r.clicks/max)*100)}%"></div></div>
+      <div class="val">${fmtInt(r.clicks)}</div>
+    `;
+    els.topBars.appendChild(div);
+  });
+  if (!top.length){
+    els.topBars.innerHTML = `<div class="small muted">無資料可顯示（可能被篩選條件排除）。</div>`;
+  }
+}
+
+function renderSummary(sum){
+  els.summaryBox.style.display = "block";
+  els.summaryBox.innerHTML = `
+    <b>重點結論（自動產生）</b><br/>
+    1) 分級：A ${sum.counts.A||0}、B ${sum.counts.B||0}、C ${sum.counts.C||0}、D ${sum.counts.D||0}。<br/>
+    2) 可直接淘汰訊號：大曝光零點擊 ${fmtInt(sum.zeroLargeCount)} 個（CTR=0 且曝光≥門檻）。<br/>
+    3) 點擊高度集中：前 ${sum.topN} 個主維度貢獻約 ${pct(sum.topClickShare)} 點擊。<br/>
+    <span class="muted">資料列使用/略過：${fmtInt(sum.warnings.usedRows)}/${fmtInt(sum.warnings.skippedRows)}；缺欄位檔案數：${fmtInt(sum.warnings.missingCols)}。</span>
+  `;
+}
+
+function buildMediaLine(sum){
+  const t = sum.thresholds;
+  const c = sum.counts;
+  return [
+    `本次檢視共 ${sum.placements} 個主維度（總曝光 ${fmtInt(sum.totalImp)}、總點擊 ${fmtInt(sum.totalClk)}、加權CTR ${pct(sum.weightedCtr)}）。`,
+    `依門檻（A≥${(t.aCtr*100).toFixed(2)}%、B≥${(t.bCtr*100).toFixed(2)}%、D<${fmtInt(t.minImp)}曝光、C判斷曝光≥${fmtInt(t.cImp)}且CTR=0）分級：A ${c.A||0}、B ${c.B||0}、C ${c.C||0}、D ${c.D||0}。`,
+    `請優先保留並加碼 A/B；同時下調或排除 C（含 ${fmtInt(sum.zeroLargeCount)} 個「大曝光零點擊」）以避免預算被低互動版位稀釋。`,
+    `點擊貢獻高度集中：前 ${sum.topN} 個主維度約貢獻 ${pct(sum.topClickShare)} 點擊，後段長尾建議採「保留少量做reach或直接排除」。`
+  ].join("\n");
+}
+
+function renderMainTable(rows){
+  const sortBy = els.sortBy.value;
+  const lim = Number(els.limitRows.value || 50);
+
+  const sorted = [...rows];
+  if (sortBy === "ctr") sorted.sort((a,b) => (b.ctr - a.ctr) || (b.clicks - a.clicks));
+  else if (sortBy === "impressions") sorted.sort((a,b) => (b.impressions - a.impressions) || (b.clicks - a.clicks));
+  else sorted.sort((a,b) => (b.clicks - a.clicks) || (b.impressions - a.impressions));
+
+  const show = sorted.slice(0, lim);
+
+  els.mainTableBody.innerHTML = show.map(r => `
+    <tr>
+      <td><span class="pill ${r.grade}">${r.grade}</span></td>
+      <td>
+        <div title="${escapeHtml(r.dimValue)}">${escapeHtml(r.dimValue)}</div>
+        <div class="small muted">${escapeHtml(r.file)}</div>
+      </td>
+      <td>${escapeHtml(r.device || "—")}</td>
+      <td class="mono">${fmtInt(r.impressions)}</td>
+      <td class="mono">${fmtInt(r.clicks)}</td>
+      <td class="mono">${pct(r.ctr)}</td>
+      <td class="mono">${pct(r.clickShare)}</td>
+      <td>${escapeHtml(r.action)}</td>
+    </tr>
+  `).join("");
+
+  if (!show.length){
+    els.mainTableBody.innerHTML = `<tr><td colspan="8" class="muted">無資料可顯示（可能被篩選條件排除）。</td></tr>`;
+  }
+}
+
+function renderTrendTable(trendRows){
+  if (!trendRows || !trendRows.length){
+    els.trendTableBody.innerHTML = `<tr><td colspan="4" class="muted">無趨勢資料（未選日期欄位或日期無法解析）。</td></tr>`;
+    return;
+  }
+  els.trendTableBody.innerHTML = trendRows.map(r => `
+    <tr>
+      <td>${escapeHtml(r.dateKey)}</td>
+      <td class="mono">${fmtInt(r.impressions)}</td>
+      <td class="mono">${fmtInt(r.clicks)}</td>
+      <td class="mono">${pct(r.ctr)}</td>
+    </tr>
+  `).join("");
+}
+
+function drawTrendCanvas(trendRows){
+  const canvas = els.trendCanvas;
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "rgba(27,39,64,.12)";
+  ctx.fillRect(0,0,W,H);
+
+  if (!trendRows || trendRows.length < 2){
+    ctx.fillStyle = "rgba(163,179,217,.9)";
+    ctx.font = "14px " + getComputedStyle(document.body).fontFamily;
+    ctx.fillText("無趨勢資料（請確認日期欄位／篩選條件）", 18, 40);
+    return;
+  }
+
+  const metric = els.trendMetric.value;
+  const values = trendRows.map(r => {
+    if (metric === "impressions") return r.impressions;
+    if (metric === "clicks") return r.clicks;
+    return r.ctr; // ctr fraction
+  });
+
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+
+  const padL = 46, padR = 18, padT = 18, padB = 38;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  // axes
+  ctx.strokeStyle = "rgba(163,179,217,.22)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT + plotH);
+  ctx.lineTo(padL + plotW, padT + plotH);
+  ctx.stroke();
+
+  // y labels (3 ticks)
+  ctx.fillStyle = "rgba(163,179,217,.85)";
+  ctx.font = "12px " + getComputedStyle(document.body).fontFamily;
+
+  const ticks = 3;
+  for (let i=0;i<=ticks;i++){
+    const y = padT + (plotH * i / ticks);
+    const v = maxV - (maxV-minV) * i / ticks;
+    const label = (metric === "ctr") ? pct(v) : fmtInt(v);
+    ctx.fillText(label, 6, y+4);
+    ctx.strokeStyle = "rgba(163,179,217,.12)";
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + plotW, y);
+    ctx.stroke();
+  }
+
+  // x labels (start/end)
+  ctx.fillStyle = "rgba(163,179,217,.85)";
+  ctx.fillText(trendRows[0].dateKey, padL, padT + plotH + 24);
+  ctx.fillText(trendRows[trendRows.length-1].dateKey, padL + plotW - 110, padT + plotH + 24);
+
+  // line
+  ctx.strokeStyle = "rgba(96,165,250,.85)";
+  ctx.lineWidth = 2;
+
+  const xFor = (i) => padL + plotW * (i/(trendRows.length-1));
+  const yFor = (v) => {
+    const denom = (maxV - minV) || 1;
+    return padT + plotH * (1 - (v - minV) / denom);
+  };
+
+  ctx.beginPath();
+  values.forEach((v,i) => {
+    const x = xFor(i), y = yFor(v);
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // points
+  ctx.fillStyle = "rgba(96,165,250,.95)";
+  values.forEach((v,i) => {
+    const x = xFor(i), y = yFor(v);
+    ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fill();
+  });
+
+  // hint
+  const t = metric === "ctr" ? "CTR（加權）" : (metric === "clicks" ? "Clicks（點擊）" : "Impressions（曝光）");
+  els.trendHint.textContent = `曲線指標：${t}。資料點：${trendRows.length}。`;
+}
+
+/* ========== Export ========== */
+function toTSV(rows){
+  const header = ["Grade","DimValue","Device","Impressions","Clicks","CTR","ClickShare","Action","File"].join("\t");
+  const lines = rows.map(r => [
+    r.grade,
+    r.dimValue,
+    r.device || "",
+    Math.round(r.impressions),
+    Math.round(r.clicks),
+    (r.ctr*100).toFixed(4) + "%",
+    (r.clickShare*100).toFixed(2) + "%",
+    r.action,
+    r.file
+  ].join("\t"));
+  return [header, ...lines].join("\n");
+}
+function toCSV(rows){
+  const esc = (v) => {
+    const s = String(v ?? "");
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  };
+  const header = ["Grade","DimValue","Device","Impressions","Clicks","CTR","ClickShare","Action","File"].join(",");
+  const lines = rows.map(r => [
+    r.grade,
+    esc(r.dimValue),
+    esc(r.device || ""),
+    Math.round(r.impressions),
+    Math.round(r.clicks),
+    (r.ctr*100).toFixed(4) + "%",
+    (r.clickShare*100).toFixed(2) + "%",
+    esc(r.action),
+    esc(r.file)
+  ].join(","));
+  return [header, ...lines].join("\n");
+}
+function download(text, filename, mime){
+  const blob = new Blob([text], {type: mime || "text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+
+/* ========== Events ========== */
+function resetOutputs(){
+  els.kpiFlight.textContent = "—"; els.kpiFlightS.textContent = "—";
+  els.kpiImp.textContent = "—"; els.kpiImpS.textContent = "—";
+  els.kpiClk.textContent = "—"; els.kpiClkS.textContent = "—";
+  els.kpiCtr.textContent = "—"; els.kpiCtrS.textContent = "—";
+  els.topBars.innerHTML = "";
+  els.summaryBox.style.display = "none";
+  els.mediaLine.value = "";
+  els.trendHint.textContent = "";
+  els.trendTableBody.innerHTML = `<tr><td colspan="4" class="muted">尚未分析。</td></tr>`;
+  els.mainTableBody.innerHTML = `<tr><td colspan="8" class="muted">尚未分析。</td></tr>`;
+  drawTrendCanvas([]);
+  els.btnCopyTSV.disabled = true;
+  els.btnDownloadCSV.disabled = true;
+  els.btnCopyMediaLine.disabled = true;
+}
+
+els.fileInput.addEventListener("change", async (e) => {
+  rawFiles = Array.from(e.target.files || []);
+  resetOutputs();
+
+  if (!rawFiles.length){
+    els.fileList.textContent = "尚未選擇檔案。";
+    els.btnClear.disabled = true;
+    els.btnReload.disabled = true;
+    els.btnAnalyze.disabled = true;
+    return;
+  }
+
+  els.fileList.textContent = rawFiles.map(f => `• ${f.name} (${Math.round(f.size/1024).toLocaleString()} KB)`).join("\n");
+  els.btnClear.disabled = false;
+  els.btnReload.disabled = false;
+  els.btnAnalyze.disabled = true;
+
+  await parseAllFiles();
+});
+
+els.btnReload.addEventListener("click", async () => {
+  if (!rawFiles.length) return;
+  resetOutputs();
+  await parseAllFiles();
+});
+
+els.btnClear.addEventListener("click", () => {
+  els.fileInput.value = "";
+  rawFiles = [];
+  parsedFiles = [];
+  headerOptions = [];
+  resetOutputs();
+  els.fileList.textContent = "尚未選擇檔案。";
+  els.btnClear.disabled = true;
+  els.btnReload.disabled = true;
+  els.btnAnalyze.disabled = true;
+
+  // clear selects
+  [els.selDim, els.selDate, els.selImp, els.selClk, els.selDevice].forEach(s => s.innerHTML = "");
+  setDeviceFilterOptions();
+});
+
+function refreshAnalysis(){
+  const result = analyze();
+  if (!result) return;
+  last = result;
+
+  setKpis(result.summary);
+  renderTopBars(result.mainRows);
+  renderSummary(result.summary);
+  els.mediaLine.value = buildMediaLine(result.summary);
+
+  renderMainTable(result.mainRows);
+  renderTrendTable(result.trendRows);
+  drawTrendCanvas(result.trendRows);
+
+  els.btnCopyTSV.disabled = false;
+  els.btnDownloadCSV.disabled = false;
+  els.btnCopyMediaLine.disabled = false;
+}
+
+els.btnAnalyze.addEventListener("click", () => {
+  resetOutputs();
+  refreshAnalysis();
+});
+
+// Recompute when any config changes (if already analyzed)
+[
+  els.selDim, els.selDate, els.selImp, els.selClk, els.selDevice,
+  els.minImp, els.cImp, els.aCtr, els.bCtr,
+  els.fltText, els.fltDateFrom, els.fltDateTo, els.fltDevice,
+  els.mergeMode, els.sortBy, els.limitRows
+].forEach(el => {
+  el.addEventListener("change", () => { if (parsedFiles.length) refreshAnalysis(); });
+  el.addEventListener("input", () => { if (parsedFiles.length) refreshAnalysis(); });
+});
+
+els.trendMetric.addEventListener("change", () => { if (last) drawTrendCanvas(last.trendRows); });
+
+els.btnCopyTSV.addEventListener("click", async () => {
+  if (!last) return;
+  const ok = await copyText(toTSV(last.mainRows));
+  els.btnCopyTSV.textContent = ok ? "已複製 TSV" : "複製失敗";
+  setTimeout(()=>els.btnCopyTSV.textContent="複製 TSV（貼到 Sheets）", 1200);
+});
+els.btnDownloadCSV.addEventListener("click", () => {
+  if (!last) return;
+  const csv = toCSV(last.mainRows);
+  const name = `yahoo_reco_${new Date().toISOString().slice(0,10)}.csv`;
+  download(csv, name, "text/csv;charset=utf-8");
+});
+els.btnCopyMediaLine.addEventListener("click", async () => {
+  const ok = await copyText(els.mediaLine.value || "");
+  els.btnCopyMediaLine.textContent = ok ? "已複製指示" : "複製失敗";
+  setTimeout(()=>els.btnCopyMediaLine.textContent="複製媒體一句話指示", 1200);
+});
+
+// Tabs
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+    t.classList.add("active");
+    const view = t.dataset.view;
+    document.getElementById("view-overview").style.display = (view==="overview") ? "block" : "none";
+    document.getElementById("view-trend").style.display = (view==="trend") ? "block" : "none";
+    document.getElementById("view-table").style.display = (view==="table") ? "block" : "none";
+    // redraw canvas when switching to trend
+    if (view==="trend" && last) drawTrendCanvas(last.trendRows);
+  });
+});
+
+// init
+resetOutputs();
+setDeviceFilterOptions();
+</script>
+</body>
+</html>
