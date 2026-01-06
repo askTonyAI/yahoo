@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Jaguar 捷豹（台灣）｜Yahoo! 夥伴一頁式知識圖表</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#11131a;
+      --panel2:#0f1016;
+      --text:#e9ecf1;
+      --muted:#b6bcc7;
+      --line:#232735;
+      --jag:#00c389;         /* 英倫綠感 */
+      --yahoo:#5f01d1;       /* Yahoo 紫 */
+      --warn:#ffcc66;
+      --good:#6ee7ff;
+      --bad:#ff6b8a;
+      --chip:#1a1e2a;
+      --shadow: 0 12px 30px rgba(0,0,0,.45);
+      --radius:16px;
+      --radius2:22px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", "PingFang TC", "Heiti TC", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background:
+        radial-gradient(1200px 700px at 20% 0%, rgba(95,1,209,.20), transparent 55%),
+        radial-gradient(900px 500px at 85% 10%, rgba(0,195,137,.18), transparent 55%),
+        radial-gradient(900px 600px at 40% 90%, rgba(110,231,255,.10), transparent 55%),
+        linear-gradient(180deg, #07080b 0%, #0b0c10 45%, #07080b 100%);
+      color:var(--text);
+    }
+    a{color:inherit}
+    .wrap{max-width:1200px;margin:0 auto;padding:28px 18px 60px}
+    .topbar{
+      display:flex;gap:14px;align-items:center;justify-content:space-between;
+      padding:18px 18px;
+      border:1px solid var(--line);
+      border-radius:var(--radius2);
+      background:linear-gradient(180deg, rgba(17,19,26,.9) 0%, rgba(15,16,22,.75) 100%);
+      box-shadow:var(--shadow);
+      position:sticky;top:14px;z-index:10;
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex;gap:12px;align-items:center;min-width:0;
+    }
+    .logo{
+      width:46px;height:46px;border-radius:14px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(110,231,255,.35), transparent 60%),
+        linear-gradient(135deg, rgba(0,195,137,.9), rgba(95,1,209,.85));
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 10px 18px rgba(0,0,0,.35);
+    }
+    .brand h1{
+      font-size:16px;line-height:1.2;margin:0;
+      letter-spacing:.2px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .brand p{
+      margin:4px 0 0 0;color:var(--muted);font-size:12px;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .meta{
+      text-align:right;min-width:180px;
+      font-size:12px;color:var(--muted);
+    }
+    .meta .pill{
+      display:inline-flex;gap:8px;align-items:center;justify-content:flex-end;
+      padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(0,0,0,.25);
+    }
+    .dot{width:8px;height:8px;border-radius:50%}
+    .dot.j{background:var(--jag)}
+    .dot.y{background:var(--yahoo)}
+    .grid{
+      display:grid;gap:16px;margin-top:18px;
+      grid-template-columns: 1.2fr .8fr;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .meta{display:none}
+      .topbar{position:relative;top:auto}
+    }
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius2);
+      background:linear-gradient(180deg, rgba(17,19,26,.88) 0%, rgba(15,16,22,.70) 100%);
+      box-shadow:var(--shadow);
+      padding:16px 16px;
+    }
+    .card h2{
+      margin:0 0 10px 0;
+      font-size:14px;letter-spacing:.2px;
+      display:flex;gap:10px;align-items:center;
+    }
+    .tag{
+      font-size:11px;color:var(--muted);
+      border:1px solid var(--line);
+      padding:4px 8px;border-radius:999px;
+      background:rgba(0,0,0,.18);
+      display:inline-flex;gap:6px;align-items:center;
+      margin-left:auto;
+    }
+    .tag .mini{width:8px;height:8px;border-radius:2px;background:var(--good);opacity:.8}
+    .kpiRow{
+      display:grid;gap:12px;
+      grid-template-columns: repeat(4, 1fr);
+      margin-top:10px;
+    }
+    @media (max-width:980px){
+      .kpiRow{grid-template-columns: repeat(2, 1fr)}
+    }
+    .kpi{
+      padding:12px;border-radius:16px;border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+    }
+    .kpi .num{font-family:var(--mono);font-size:18px}
+    .kpi .lab{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.35}
+    .split{
+      display:grid;gap:16px;
+      grid-template-columns:1fr 1fr;
+      margin-top:16px;
+    }
+    @media (max-width:980px){.split{grid-template-columns:1fr}}
+    .cols{
+      display:grid;gap:12px;
+      grid-template-columns:1fr 1fr 1fr;
+      margin-top:10px;
+    }
+    @media (max-width:980px){.cols{grid-template-columns:1fr}}
+    .miniCard{
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.16);
+      border-radius:16px;
+      padding:12px;
+      min-height:120px;
+    }
+    .miniCard h3{margin:0 0 8px 0;font-size:13px}
+    .miniCard p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+    .list{margin:10px 0 0 0;padding-left:18px;color:var(--muted);font-size:12px;line-height:1.6}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{
+      font-size:11px;color:var(--text);
+      padding:6px 10px;border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.18);
+      display:inline-flex;gap:8px;align-items:center;
+    }
+    .chip .b{width:7px;height:7px;border-radius:50%}
+    .b.j{background:var(--jag)}
+    .b.y{background:var(--yahoo)}
+    .b.w{background:var(--warn)}
+    .b.g{background:var(--good)}
+    .badge{
+      font-size:10px;
+      padding:3px 7px;border-radius:8px;
+      border:1px dashed rgba(255,255,255,.18);
+      color:rgba(255,255,255,.80);
+      background:rgba(255,255,255,.06);
+      display:inline-flex;align-items:center;gap:6px;
+    }
+    .badge::before{
+      content:"推斷";
+      font-size:10px;
+      background:rgba(255,204,102,.18);
+      border:1px solid rgba(255,204,102,.35);
+      color:#ffd28a;
+      padding:2px 6px;border-radius:999px;
+    }
+    .hr{
+      height:1px;background:linear-gradient(90deg, transparent, var(--line), transparent);
+      margin:14px 0;
+    }
+    .flow{
+      display:grid;gap:10px;
+      grid-template-columns: repeat(5, 1fr);
+      margin-top:12px;
+    }
+    @media (max-width:980px){.flow{grid-template-columns:1fr}}
+    .node{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:rgba(0,0,0,.18);
+      position:relative;
+    }
+    .node .t{font-size:12px;margin:0 0 6px 0}
+    .node .d{font-size:11px;color:var(--muted);margin:0;line-height:1.5}
+    .node::after{
+      content:"→";
+      position:absolute;right:-16px;top:50%;
+      transform:translateY(-50%);
+      color:rgba(255,255,255,.18);
+      font-size:18px;
+    }
+    .flow .node:last-child::after{content:""}
+    @media (max-width:980px){
+      .node::after{content:"";display:none}
+    }
+    .bars{display:grid;gap:10px;margin-top:10px}
+    .bar{
+      display:grid;grid-template-columns: 120px 1fr 52px;gap:10px;
+      align-items:center;
+      font-size:12px;color:var(--muted);
+    }
+    .track{
+      height:10px;border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--yahoo), var(--jag));
+      width:50%;
+    }
+    .pct{
+      font-family:var(--mono);
+      color:rgba(255,255,255,.85);
+      text-align:right;
+    }
+    .two{
+      display:grid;gap:16px;
+      grid-template-columns: 1fr 1fr;
+      margin-top:12px;
+    }
+    @media (max-width:980px){.two{grid-template-columns:1fr}}
+    .note{
+      font-size:11px;color:rgba(255,255,255,.70);
+      line-height:1.55;
+      border-left:3px solid rgba(95,1,209,.55);
+      padding-left:10px;margin-top:10px;
+    }
+    .source{
+      font-size:11px;color:rgba(255,255,255,.60);
+      line-height:1.6;
+    }
+    .footer{
+      margin-top:16px;
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      color:rgba(255,255,255,.55);
+      font-size:11px;
+    }
+    .printHint{opacity:.9}
+    .btn{
+      font-size:11px;
+      border:1px solid var(--line);
+      background:rgba(0,0,0,.20);
+      color:rgba(255,255,255,.80);
+      padding:7px 10px;border-radius:999px;
+      cursor:pointer;
+    }
+    .btn:hover{border-color:rgba(255,255,255,.22)}
+    /* Print */
+    @media print{
+      body{background:#fff;color:#111}
+      .topbar{position:relative;top:auto;box-shadow:none}
+      .card{box-shadow:none;background:#fff;border-color:#ddd}
+      .chip,.tag,.btn{border-color:#ddd}
+      .note{border-left-color:#888}
+      a{color:#111}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Sticky header -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1>Jaguar 捷豹（台灣）｜Yahoo! 夥伴一頁式知識圖表</h1>
+          <p>品牌定位 × 產品/服務 × 受眾與數位行為（台灣研究）× Yahoo 合作切入點</p>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="pill">
+          <span class="dot j"></span><span>Jaguar</span>
+          <span style="opacity:.55">×</span>
+          <span class="dot y"></span><span>Yahoo</span>
+        </div>
+        <div style="margin-top:8px">產出日期：<span style="font-family:var(--mono)">2026-01-05</span></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn" onclick="window.print()">列印 / 匯出 PDF</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Left column -->
+      <div class="card">
+        <h2>
+          1) 品牌快照（給 30 秒內看懂的人）
+          <span class="tag"><span class="mini"></span>官方網站與研究報告整理</span>
+        </h2>
+        <div class="chips">
+          <span class="chip"><span class="b j"></span>核心語氣：Challenge Convention / Inspire Like No Other</span>
+          <span class="chip"><span class="b y"></span>主敘事：嶄新世代／復興（Type 00 概念車）</span>
+          <span class="chip"><span class="b g"></span>重點資產：車款頁＋配置器＋試駕/索資＋車主服務（InControl/保養/救援）</span>
+          <span class="chip"><span class="b w"></span>注意：概念車≠量產（官網註明）</span>
+        </div>
+
+        <div class="kpiRow">
+          <div class="kpi">
+            <div class="num">SUV / 跑車 / EV</div>
+            <div class="lab">產品結構：F-PACE、E-PACE、I-PACE（全電動）、F-TYPE</div>
+          </div>
+          <div class="kpi">
+            <div class="num">NT$218萬起</div>
+            <div class="lab">E-PACE（官網建議售價起）</div>
+          </div>
+          <div class="kpi">
+            <div class="num">NT$298萬起</div>
+            <div class="lab">I-PACE（官網建議售價起）</div>
+          </div>
+          <div class="kpi">
+            <div class="num">InControl</div>
+            <div class="lab">連線服務／帳戶啟動／訂閱管理（車主關係節點）</div>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="split">
+          <div>
+            <h2 style="margin:0 0 8px 0;font-size:13px">官方站點轉換入口（可直接對接 Yahoo 追蹤/落地頁策略）</h2>
+            <ul class="list">
+              <li>試駕（Test Drive）／索取資訊（Request Info）</li>
+              <li>車款與規格資訊、型錄/規配下載</li>
+              <li>配置器（buildyour.*）</li>
+              <li>線上預約保養、道路救援、說明指南與手冊、軟體更新</li>
+            </ul>
+          </div>
+          <div>
+            <h2 style="margin:0 0 8px 0;font-size:13px">社群佈局（官網列出）</h2>
+            <div class="chips">
+              <span class="chip">Instagram</span>
+              <span class="chip">TikTok</span>
+              <span class="chip">YouTube</span>
+              <span class="chip">Facebook</span>
+              <span class="chip">X</span>
+            </div>
+            <div class="note">
+              <b>解讀（<span class="badge"></span>）</b><br/>
+              <span class="badge"></span> 佈局同時覆蓋短影音與傳統社群，利於分眾：短影音做觸及與氛圍、YouTube 做理解型內容、官網承接規格/服務資訊。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="card">
+        <h2>2) 受眾與決策因子（Yahoo 夥伴快速對位）</h2>
+        <div class="cols">
+          <div class="miniCard">
+            <h3>主要客群</h3>
+            <p>豪華車消費者，重視英倫設計/風格敘事＋駕馭體驗；SUV/跑車皆有對應車系。</p>
+          </div>
+          <div class="miniCard">
+            <h3>電動潛在客群</h3>
+            <p>I-PACE 明確以全電動 SUV 呈現；可連結「高端電動化」需求。</p>
+          </div>
+          <div class="miniCard">
+            <h3>決策關鍵</h3>
+            <p>車型/動力（EV/燃油）＋豪華感/操控＋售後便利（保養、救援、連線服務）。</p>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2 style="margin-bottom:8px">3) 購車到車主經營：數位漏斗與內容分工</h2>
+        <div class="flow" aria-label="Funnel map">
+          <div class="node">
+            <p class="t">Awareness</p>
+            <p class="d">短影音/社群：氛圍、設計、品牌「復興/嶄新世代」</p>
+          </div>
+          <div class="node">
+            <p class="t">Interest</p>
+            <p class="d">YouTube/內容：駕馭、設計細節、觀點敘事</p>
+          </div>
+          <div class="node">
+            <p class="t">Validation</p>
+            <p class="d">搜尋/官網：規配、價格門檻、保固保養、FAQ</p>
+          </div>
+          <div class="node">
+            <p class="t">Conversion</p>
+            <p class="d">試駕/索資/配置器：明確 CTA + 表單</p>
+          </div>
+          <div class="node">
+            <p class="t">Ownership</p>
+            <p class="d">InControl/預約保養/救援：LTV 經營</p>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>對 Yahoo 合作的直覺結論（<span class="badge"></span>）</b><br/>
+          <span class="badge"></span> 如果只投「曝光」，會被短影音滑動習慣稀釋；需要把投放設計成「可驗證資訊」+「明確下一步」連到官網轉換入口，並在車主服務端延伸再行銷/關係經營。
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <!-- Left -->
+      <div class="card">
+        <h2>4) 產品/服務矩陣：主張 × 受眾 × 建議素材</h2>
+        <div class="cols">
+          <div class="miniCard">
+            <h3>F-PACE（SUV）</h3>
+            <p>主張：實用機能 + 奢華 SUV</p>
+            <ul class="list">
+              <li>素材：空間/舒適 + 高級內裝</li>
+              <li>CTA：試駕、索取資訊</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>E-PACE（小型 SUV）</h3>
+            <p>主張：靈敏反應 + 動態性能 + 造型</p>
+            <ul class="list">
+              <li>素材：都會駕馭、外觀切角</li>
+              <li>價位：NT$218萬起</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>I-PACE（全電動 SUV）</h3>
+            <p>主張：ALL‑ELECTRIC + 高效能</p>
+            <ul class="list">
+              <li>素材：電動核心賣點 + 可信資訊（充電/保養/FAQ）</li>
+              <li>價位：NT$298萬起</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cols" style="margin-top:12px">
+          <div class="miniCard">
+            <h3>F-TYPE（跑車）</h3>
+            <p>主張：跑車血統 + 駕馭體驗</p>
+            <ul class="list">
+              <li>素材：聲浪/操控/設計情緒</li>
+              <li>CTA：試駕、型錄</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>InControl（車主服務）</h3>
+            <p>主張：連線服務 + 訂閱/帳戶管理</p>
+            <ul class="list">
+              <li>素材：功能教學、情境短片</li>
+              <li>KPI：啟動率、續訂率</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>售後（保養/救援/更新）</h3>
+            <p>主張：便利、安心、可依循</p>
+            <ul class="list">
+              <li>素材：流程圖、Q&A、懶人包</li>
+              <li>CTA：線上預約保養</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="note">
+          <b>易被忽略但關鍵（<span class="badge"></span>）</b><br/>
+          <span class="badge"></span> 豪華車不只「買一次」：官網已具備車主服務入口與訂閱管理節點，可設計「購後再行銷」與「服務導流」的 Yahoo 投放/內容模組（例如：保養提醒、功能教學、升級促動）。
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="card">
+        <h2>5) 市場與趨勢（外部訊號，供提案框架使用）</h2>
+        <ul class="list">
+          <li>豪華車市場競爭：德系/日系豪華品牌為主要同場對手（<span class="badge"></span>一般市場結構推斷）。</li>
+          <li>外媒/通訊社報導：Jaguar 轉向更高端定位、並出現電動車規劃時程調整的訊息（僅作趨勢參考）。</li>
+          <li>品牌再定義：以「概念車 + 敘事（Copy Nothing / dramatic）」製造關注與討論度。</li>
+        </ul>
+
+        <div class="hr"></div>
+
+        <h2 style="margin-bottom:8px">6) Yahoo 合作切入點（可直接拆成提案模組）</h2>
+        <div class="cols">
+          <div class="miniCard">
+            <h3>模組 A｜品牌敘事放大</h3>
+            <p>把「復興/嶄新世代」轉成可被快速識別的視覺符號與一句話主張。</p>
+            <ul class="list">
+              <li>短影音/原生內容承接</li>
+              <li>目標：品牌記憶與搜尋提升</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>模組 B｜可驗證資訊前置</h3>
+            <p>用清楚結構化資訊降低「不想查證」造成的流失（見下方台灣數位行為）。</p>
+            <ul class="list">
+              <li>規配/保養/FAQ 懶人包</li>
+              <li>目標：高意圖導流到官網轉換</li>
+            </ul>
+          </div>
+          <div class="miniCard">
+            <h3>模組 C｜轉換與 LTV</h3>
+            <p>把試駕/索資/配置器當主轉換；購後用 InControl/保養導向延伸。</p>
+            <ul class="list">
+              <li>再行銷：已互動者分層</li>
+              <li>目標：表單/預約與續訂</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <h2 style="margin-bottom:8px">建議 KPI（依官網入口可落地）</h2>
+        <div class="chips">
+          <span class="chip">試駕表單送出率</span>
+          <span class="chip">索取資訊表單送出率</span>
+          <span class="chip">配置器啟動率 / 完成率</span>
+          <span class="chip">規配/型錄下載</span>
+          <span class="chip">線上預約保養轉換</span>
+          <span class="chip">InControl 啟動率 / 續訂率</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>
+        7) 台灣數位行為洞察（僅引用「台灣整體網路數位行為研究報告」）
+        <span class="tag"><span class="mini" style="background:var(--warn)"></span>本區數字來自研究報告</span>
+      </h2>
+
+      <div class="two">
+        <div>
+          <h2 style="margin:0 0 8px 0;font-size:13px">關鍵數字一眼看懂</h2>
+
+          <div class="bars">
+            <div class="bar">
+              <div>短影音：一天數次</div>
+              <div class="track"><div class="fill" style="width:49.98%"></div></div>
+              <div class="pct">49.98%</div>
+            </div>
+            <div class="bar">
+              <div>短影音：不自覺滑</div>
+              <div class="track"><div class="fill" style="width:56.38%"></div></div>
+              <div class="pct">56.38%</div>
+            </div>
+            <div class="bar">
+              <div>查證：從來沒有</div>
+              <div class="track"><div class="fill" style="width:40.83%;background:linear-gradient(90deg,var(--bad),var(--warn))"></div></div>
+              <div class="pct">40.83%</div>
+            </div>
+            <div class="bar">
+              <div>查證：很少</div>
+              <div class="track"><div class="fill" style="width:25.08%;background:linear-gradient(90deg,var(--bad),var(--warn))"></div></div>
+              <div class="pct">25.08%</div>
+            </div>
+            <div class="bar">
+              <div>生成式 AI：近三月使用</div>
+              <div class="track"><div class="fill" style="width:43.19%"></div></div>
+              <div class="pct">43.19%</div>
+            </div>
+          </div>
+
+          <div class="note">
+            <b>Yahoo 角度的結論：</b><br/>
+            1) 「高頻短影音」≠「高記憶」：需強品牌符號與清楚 CTA。<br/>
+            2) 多數人不做查證：品牌必須把可核對資訊放在最靠近轉換的地方。<br/>
+            3) AI 使用上升：官網內容越結構化，越能降低被 AI 摘要轉述失真風險。<br/>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="margin:0 0 8px 0;font-size:13px">Canvas 圖表（可截圖貼簡報）</h2>
+          <div class="miniCard" style="min-height:unset">
+            <p style="margin:0 0 8px 0;color:var(--muted);font-size:12px">
+              以 <code style="font-family:var(--mono)">canvas</code> 畫出三個「注意力與資訊風險」指標（%）。
+            </p>
+            <canvas id="donut" width="520" height="270" style="width:100%;height:auto;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.18)"></canvas>
+            <p class="source" style="margin-top:10px">
+              指標：短影音「不自覺滑」56.38%、短影音「一天數次」49.98%、生成式 AI 使用 43.19%（研究報告）。<br/>
+              註：查證「從來沒有/很少」比例高，建議以「可驗證資訊」補強轉換路徑。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h2 style="margin-bottom:8px">8) 5 個容易被忽略、但會影響投放與內容的行為洞察（研究 → 策略影響）</h2>
+      <div class="cols">
+        <div class="miniCard">
+          <h3>① 短影音高頻，但「自動化滑動」更危險</h3>
+          <p><b>行為：</b>一天數次觀看 49.98%；不自覺滑 56.38%。</p>
+          <p><b>容易被忽略：</b>只看播放量會高估有效注意力。</p>
+          <p><b>策略影響：</b>內容需「瞬間可識別」+ 明確下一步（試駕/索資）。</p>
+        </div>
+        <div class="miniCard">
+          <h3>② 多數人不查證：驗證成本要前置</h3>
+          <p><b>行為：</b>查證從來沒有 40.83%，很少 25.08%。</p>
+          <p><b>容易被忽略：</b>高單價不代表一定會做功課。</p>
+          <p><b>策略影響：</b>規配/保養/保固/FAQ 需在落地頁第一屏可見。</p>
+        </div>
+        <div class="miniCard">
+          <h3>③ 新聞來源分工：多管道不是重複投放</h3>
+          <p><b>行為：</b>電視 32.02%、社群 21.11%、YouTube 14.67%、搜尋 13.72%。</p>
+          <p><b>容易被忽略：</b>把資訊漏斗當單一入口。</p>
+          <p><b>策略影響：</b>分層內容：社群做氛圍、YouTube 做理解、搜尋/官網做確認。</p>
+        </div>
+      </div>
+
+      <div class="cols" style="margin-top:12px">
+        <div class="miniCard">
+          <h3>④ 社群仍集中，但碎片化擴散加速</h3>
+          <p><b>行為：</b>FB 45.59%、IG 18.70%、Threads 4.06%；平台更分散。</p>
+          <p><b>容易被忽略：</b>只押單一主平台。</p>
+          <p><b>策略影響：</b>內容要可被轉貼引用（圖卡/短句/片段），並監測新平台早期訊號。</p>
+        </div>
+        <div class="miniCard">
+          <h3>⑤ 生成式 AI 使用上升：官方版本要「可被摘要」</h3>
+          <p><b>行為：</b>近三月使用生成式 AI 43.19%。</p>
+          <p><b>容易被忽略：</b>以為官網內容完整就足夠。</p>
+          <p><b>策略影響：</b>用 FAQ/結構化資訊降低 AI 轉述失真（規格、售後、價格門檻）。</p>
+        </div>
+        <div class="miniCard">
+          <h3>建議：把洞察翻成投放檢核表</h3>
+          <ul class="list">
+            <li>每支短影音：3 秒內是否辨識品牌？</li>
+            <li>落地頁：是否能「不查證也看懂」？</li>
+            <li>是否分層承接：觸及→理解→確認→轉換？</li>
+            <li>官網資訊：是否便於 AI/搜尋抓取？</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>9) 資料來源與使用範圍（透明度）</h2>
+      <div class="source">
+        <b>主要一手來源：</b>Jaguar 台灣官方網站（車款頁、服務頁、轉換入口、社群連結）。<br/>
+        <b>研究報告（本頁第 7–8 區僅用此來源）：</b>《台灣整體網路數位行為研究報告》（短影音使用頻率、滑動習慣、查證頻率、新聞來源、社群主平台、生成式 AI 使用比例）。<br/>
+        <b>外部趨勢訊號（僅供框架參考）：</b>外媒/通訊社對 Jaguar 轉型與電動化時程調整的報導（不作為官網事實聲明）。<br/>
+        <br/>
+        <span class="printHint">註：文中標示「推斷」者，為依官網內容結構與轉換入口所做的策略解讀，非官方明文。</span>
+      </div>
+
+      <div class="footer">
+        <div>© One-page Partner Brief (Jaguar TW × Yahoo) — internal use</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span class="chip"><span class="b j"></span>品牌</span>
+          <span class="chip"><span class="b y"></span>媒體/合作</span>
+          <span class="chip"><span class="b w"></span>研究洞察</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple donut-like rings on canvas (no external libs)
+    const c = document.getElementById("donut");
+    const ctx = c.getContext("2d");
+
+    function ring(cx, cy, r, w, pct, colorA, colorB, label, value) {
+      const start = -Math.PI / 2;
+      const end = start + (Math.PI * 2 * (pct / 100));
+
+      // Track
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(255,255,255,.10)";
+      ctx.lineWidth = w;
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Gradient arc
+      const g = ctx.createLinearGradient(cx - r, cy, cx + r, cy);
+      g.addColorStop(0, colorA);
+      g.addColorStop(1, colorB);
+
+      ctx.beginPath();
+      ctx.strokeStyle = g;
+      ctx.lineWidth = w;
+      ctx.lineCap = "round";
+      ctx.arc(cx, cy, r, start, end);
+      ctx.stroke();
+
+      // Text
+      ctx.fillStyle = "rgba(233,236,241,.92)";
+      ctx.font = "12px ui-sans-serif, system-ui";
+      ctx.fillText(label, cx + r + 22, cy - 6);
+
+      ctx.fillStyle = "rgba(255,255,255,.78)";
+      ctx.font = "12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace";
+      ctx.fillText(value, cx + r + 22, cy + 14);
+    }
+
+    function draw() {
+      // Fit for high DPI
+      const dpr = window.devicePixelRatio || 1;
+      const rect = c.getBoundingClientRect();
+      c.width = Math.round(rect.width * dpr);
+      c.height = Math.round((rect.width * 0.52) * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Clear
+      ctx.clearRect(0, 0, rect.width, rect.width * 0.52);
+
+      // Title
+      ctx.fillStyle = "rgba(255,255,255,.80)";
+      ctx.font = "13px ui-sans-serif, system-ui";
+      ctx.fillText("注意力 / 資訊路徑關鍵指標（%）", 16, 24);
+
+      // Rings
+      const cx = 120, cy = 145;
+      ring(cx, cy, 70, 14, 56.38, "#5f01d1", "#00c389", "短影音：不自覺滑", "56.38%");
+      ring(cx, cy, 48, 14, 49.98, "#6ee7ff", "#5f01d1", "短影音：一天數次", "49.98%");
+      ring(cx, cy, 26, 14, 43.19, "#00c389", "#6ee7ff", "生成式 AI：近三月使用", "43.19%");
+
+      // Legend hint
+      ctx.fillStyle = "rgba(255,255,255,.55)";
+      ctx.font = "11px ui-sans-serif, system-ui";
+      ctx.fillText("解讀：滑動慣性↑ → 品牌符號與 CTA 必須更『瞬間可辨識』；AI 使用↑ → 官網需更結構化。", 16, cy + 98);
+    }
+
+    window.addEventListener("resize", draw);
+    draw();
+  </script>
+</body>
+</html>
