@@ -1,0 +1,1930 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jaguar 台灣 2026 H1｜Yahoo!奇摩 媒體策略研究（內部決策版）</title>
+
+
+  <!--
+    ✅ 重用指引（請內部同仁閱讀）
+    1) 替換公司識別（Logo / 主色）：
+       - Logo：搜尋 "Yahoo!奇摩（內部）" 可替換為 SVG / 圖片（建議 inline SVG 以離線可用）
+       - 主色：修改 CSS 變數 --accent / --accent-2 即可
+    2) 擴充章節：
+       - 在 <main id="main"> 裡新增一個 <section class="section">，內含 <details data-persist> + <summary> + 內容
+       - 只要章節內有 <h2>/<h3>，左側目錄（TOC）會自動生成
+    3) 貼入下一份報告重用：
+       - 以本檔為模板，替換「Executive Summary」「章節內容」「附錄原文」區塊即可
+       - 注意：請同步更新「Objective / Key Questions / Critical Points」三個快掃區塊
+  -->
+
+
+  <style>
+    :root{
+      --bg: #f7f8fb;
+      --panel: #ffffff;
+      --text: #121826;
+      --muted: #566074;
+      --border: rgba(17, 24, 39, 0.10);
+      --shadow: 0 10px 30px rgba(17,24,39,.06);
+      --shadow-2: 0 12px 40px rgba(17,24,39,.10);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --accent: #5f01d1;      /* Yahoo-ish purple */
+      --accent-2: #7c3aed;    /* purple highlight */
+      --ok: #0f766e;
+      --warn: #b45309;
+      --bad: #b91c1c;
+      --info: #1d4ed8;
+
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", Arial, sans-serif;
+
+
+      --sidebar-w: 318px;
+      --header-h: 74px;
+
+
+      --focus-ring: 0 0 0 3px rgba(95,1,209,.20);
+    }
+
+
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg: #0b1020;
+        --panel: #0f172a;
+        --text: #e7eaf3;
+        --muted: #a8b0c2;
+        --border: rgba(231,234,243,0.12);
+        --shadow: 0 10px 30px rgba(0,0,0,.35);
+        --shadow-2: 0 12px 40px rgba(0,0,0,.45);
+      }
+    }
+
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.55;
+    }
+
+
+    a{ color:inherit; text-decoration:none; }
+    a:hover{ text-decoration:underline; text-decoration-color: rgba(95,1,209,.45); }
+
+
+    .app{
+      display:flex;
+      min-height:100%;
+    }
+
+
+    /* Sidebar */
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      width:var(--sidebar-w);
+      background: linear-gradient(180deg, rgba(95,1,209,.07), rgba(95,1,209,0) 38%), var(--panel);
+      border-right:1px solid var(--border);
+      padding:14px 12px;
+      overflow:auto;
+      transition: width .18s ease, transform .18s ease;
+      z-index:30;
+    }
+
+
+    .sidebar.is-collapsed{
+      width:64px;
+    }
+
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px 6px;
+      margin-bottom:8px;
+      border-radius:12px;
+    }
+    .brand .mark{
+      width:38px; height:38px;
+      border-radius:12px;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.9), rgba(255,255,255,0) 55%),
+                  linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+      flex:0 0 auto;
+    }
+    .brand .meta{
+      min-width:0;
+    }
+    .brand .meta .name{
+      font-weight:800;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand .meta .sub{
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+
+    .sidebar .controls{
+      display:flex;
+      gap:8px;
+      padding:0 10px 10px;
+    }
+
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: var(--panel);
+      color:var(--text);
+      padding:9px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:650;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 1px 0 rgba(17,24,39,.04);
+      transition: transform .06s ease, border-color .12s ease, box-shadow .12s ease;
+      user-select:none;
+    }
+    .btn:hover{ border-color: rgba(95,1,209,.35); box-shadow: var(--shadow); }
+    .btn:active{ transform: translateY(1px); }
+    .btn:focus{ outline:none; box-shadow: var(--focus-ring); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(95,1,209,.95), rgba(124,58,237,.95));
+      border-color: rgba(95,1,209,.40);
+      color: #fff;
+    }
+    .btn.ghost{
+      background: transparent;
+    }
+    .btn.icon{
+      padding:9px 10px;
+      width:40px;
+      justify-content:center;
+    }
+
+
+    .sidebar.is-collapsed .brand .meta,
+    .sidebar.is-collapsed #tocWrap,
+    .sidebar.is-collapsed .controls .btn:not(.icon){
+      display:none;
+    }
+
+
+    .toc-title{
+      padding:10px 10px 8px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .toc-title .label{
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+
+    nav#toc{
+      padding:0 6px 16px;
+    }
+    .toc-item{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:12px;
+      cursor:pointer;
+      border:1px solid transparent;
+      transition: background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .toc-item:hover{
+      background: rgba(95,1,209,.06);
+      border-color: rgba(95,1,209,.18);
+    }
+    .toc-item .dot{
+      width:8px; height:8px; border-radius:99px;
+      margin-top:6px;
+      background: rgba(95,1,209,.35);
+      flex: 0 0 auto;
+    }
+    .toc-item .text{
+      min-width:0;
+      font-size:13.5px;
+      color: var(--text);
+      line-height:1.35;
+    }
+    .toc-item .text small{
+      display:block;
+      color: var(--muted);
+      font-size:12px;
+      margin-top:2px;
+    }
+    .toc-item.level-h3{ padding-left:22px; }
+    .toc-item.level-h3 .dot{ background: rgba(95,1,209,.22); width:6px; height:6px; margin-top:7px; }
+
+
+    .toc-item.active{
+      background: rgba(95,1,209,.10);
+      border-color: rgba(95,1,209,.30);
+    }
+    .toc-item.active .dot{ background: var(--accent); }
+
+
+    /* Content */
+    .content{
+      flex:1;
+      min-width:0;
+    }
+
+
+    .header{
+      position:sticky;
+      top:0;
+      z-index:20;
+      height:auto;
+      border-bottom:1px solid var(--border);
+      background: rgba(247,248,251,.82);
+      backdrop-filter: blur(10px);
+    }
+    @media (prefers-color-scheme: dark){
+      .header{ background: rgba(11,16,32,.82); }
+    }
+
+
+    .header-inner{
+      max-width: 1200px;
+      margin:0 auto;
+      padding:16px 18px 12px;
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+
+
+    .titleblock{
+      min-width:0;
+    }
+    .titleblock h1{
+      margin:0;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .titleblock .subtitle{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.70);
+      box-shadow: 0 1px 0 rgba(17,24,39,.04);
+      font-size:12.5px;
+      color: var(--text);
+      white-space:nowrap;
+    }
+    @media (prefers-color-scheme: dark){
+      .chip{ background: rgba(15,23,42,.70); }
+    }
+    .chip b{ font-weight:800; }
+    .chip.purple{
+      border-color: rgba(95,1,209,.28);
+      background: rgba(95,1,209,.08);
+    }
+
+
+    .right-tools{
+      width: 440px;
+      max-width: 52vw;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+    }
+
+
+    .searchbar{
+      width:100%;
+      background: var(--panel);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding:10px 12px;
+      box-shadow: var(--shadow);
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .searchbar input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:14px;
+    }
+    .searchbar input::placeholder{ color: rgba(86,96,116,.85); }
+    @media (prefers-color-scheme: dark){
+      .searchbar input::placeholder{ color: rgba(168,176,194,.85); }
+    }
+
+
+    .search-meta{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .search-count{
+      color:var(--muted);
+      font-size:12.5px;
+      white-space:nowrap;
+    }
+
+
+    .reading-nav{
+      width:100%;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+    .reading-nav .chip{
+      cursor:pointer;
+      transition: transform .06s ease, border-color .12s ease;
+    }
+    .reading-nav .chip:hover{ border-color: rgba(95,1,209,.35); transform: translateY(-1px); }
+    .reading-nav .chip:active{ transform: translateY(0px); }
+
+
+    /* Main layout */
+    main{
+      max-width: 1200px;
+      margin: 18px auto 90px;
+      padding: 0 18px;
+    }
+
+
+    .section{
+      background: var(--panel);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin: 14px 0;
+      overflow:hidden;
+    }
+
+
+    details{
+      border-radius: var(--radius);
+    }
+    details summary{
+      list-style:none;
+      cursor:pointer;
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      border-bottom:1px solid rgba(0,0,0,0);
+      user-select:none;
+    }
+    details[open] summary{
+      border-bottom:1px solid var(--border);
+      background: linear-gradient(90deg, rgba(95,1,209,.07), rgba(95,1,209,0) 55%);
+    }
+
+
+    summary::-webkit-details-marker{ display:none; }
+
+
+    .section-title{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+    }
+    .section-title h2{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .section-title .tag{
+      flex:0 0 auto;
+    }
+    .chev{
+      flex:0 0 auto;
+      width:34px; height:34px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--muted);
+      background: rgba(255,255,255,.55);
+      transition: transform .14s ease;
+    }
+    @media (prefers-color-scheme: dark){
+      .chev{ background: rgba(15,23,42,.55); }
+    }
+    details[open] .chev{ transform: rotate(180deg); }
+
+
+    .section-body{
+      padding: 14px 16px 18px;
+    }
+
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+    .col-12{ grid-column: span 12; }
+    .col-8{ grid-column: span 8; }
+    .col-6{ grid-column: span 6; }
+    .col-4{ grid-column: span 4; }
+    .col-3{ grid-column: span 3; }
+    @media (max-width: 980px){
+      .col-8,.col-6,.col-4,.col-3{ grid-column: span 12; }
+      .right-tools{ width: 100%; max-width:none; align-items:flex-start; }
+      .header-inner{ flex-direction:column; align-items:stretch; }
+      .reading-nav{ justify-content:flex-start; }
+    }
+
+
+    .kicker{
+      color: var(--muted);
+      font-size: 12.5px;
+      margin: 0 0 10px;
+    }
+
+
+    .hl{
+      display:inline-block;
+      padding-bottom:2px;
+      border-bottom: 2px solid rgba(95,1,209,.35);
+    }
+
+
+    .callout{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      background: rgba(95,1,209,.05);
+    }
+    .callout .title{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+      font-weight: 850;
+    }
+    .callout p{ margin: 8px 0 0; color: var(--text); }
+    .callout small{ color: var(--muted); }
+    .callout.risk{
+      background: rgba(180,83,9,.08);
+      border-color: rgba(180,83,9,.28);
+    }
+    .callout.note{
+      background: rgba(29,78,216,.07);
+      border-color: rgba(29,78,216,.26);
+    }
+
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      border:1px solid var(--border);
+      color: var(--text);
+      background: rgba(255,255,255,.70);
+      white-space:nowrap;
+    }
+    @media (prefers-color-scheme: dark){
+      .badge{ background: rgba(15,23,42,.70); }
+    }
+    .badge.purple{
+      border-color: rgba(95,1,209,.28);
+      background: rgba(95,1,209,.09);
+    }
+    .badge.ok{
+      border-color: rgba(15,118,110,.28);
+      background: rgba(15,118,110,.10);
+      color: var(--text);
+    }
+    .badge.warn{
+      border-color: rgba(180,83,9,.30);
+      background: rgba(180,83,9,.10);
+      color: var(--text);
+    }
+    .badge.bad{
+      border-color: rgba(185,28,28,.30);
+      background: rgba(185,28,28,.10);
+      color: var(--text);
+    }
+    .badge.info{
+      border-color: rgba(29,78,216,.30);
+      background: rgba(29,78,216,.10);
+      color: var(--text);
+    }
+
+
+    .card{
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(17,24,39,.04);
+      padding: 12px 14px;
+    }
+    .card h3{
+      margin: 0 0 8px;
+      font-size:14.5px;
+      letter-spacing:.1px;
+    }
+    .card p{ margin: 6px 0; color: var(--text); }
+    .card .muted{ color: var(--muted); font-size:12.5px; }
+    .card .row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin: 8px 0 0;
+    }
+
+
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+    .cards .card{ grid-column: span 6; }
+    @media (max-width: 980px){
+      .cards .card{ grid-column: span 12; }
+    }
+
+
+    .list{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--text);
+    }
+    .list li{ margin: 6px 0; }
+    .list li small{ color: var(--muted); }
+
+
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+    .table th, .table td{
+      padding: 10px 10px;
+      border-bottom:1px solid var(--border);
+      vertical-align:top;
+      font-size:13px;
+      line-height:1.45;
+    }
+    .table th{
+      text-align:left;
+      font-size:12.5px;
+      color: var(--muted);
+      background: rgba(95,1,209,.06);
+      border-bottom:1px solid rgba(95,1,209,.20);
+    }
+    .table tr:last-child td{ border-bottom:none; }
+    .table code{
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(95,1,209,.09);
+      border:1px solid rgba(95,1,209,.18);
+      padding: 1px 6px;
+      border-radius: 999px;
+    }
+
+
+    .imp{
+      margin-top:12px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      background: rgba(95,1,209,.06);
+      border: 1px solid rgba(95,1,209,.18);
+    }
+    .imp b{ display:inline-block; margin-right:6px; }
+    .imp .muted{ color: var(--muted); }
+
+
+    /* Search highlights */
+    mark.search-hit{
+      background: rgba(250, 204, 21, .45);
+      color: var(--text);
+      padding: 0 2px;
+      border-radius: 4px;
+      box-decoration-break: clone;
+    }
+    mark.search-hit.active{
+      background: rgba(95,1,209,.30);
+      outline: 2px solid rgba(95,1,209,.45);
+    }
+
+
+    /* Back to top */
+    .backtotop{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      z-index:50;
+      opacity:0;
+      transform: translateY(8px);
+      pointer-events:none;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .backtotop.show{
+      opacity:1;
+      transform: translateY(0);
+      pointer-events:auto;
+    }
+
+
+    /* Mobile drawer behavior */
+    .mobile-top{
+      display:none;
+      gap:8px;
+      margin: 10px 0 0;
+    }
+    @media (max-width: 980px){
+      .sidebar{
+        position:fixed;
+        top:0;
+        left:0;
+        height:100vh;
+        transform: translateX(-102%);
+        box-shadow: var(--shadow-2);
+        width: 86vw;
+        max-width: 380px;
+      }
+      .sidebar.open{
+        transform: translateX(0);
+      }
+      .mobile-top{ display:flex; }
+    }
+
+
+    /* Appendix formatting */
+    .mono{
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height:1.5;
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      background: rgba(17,24,39,.03);
+    }
+    @media (prefers-color-scheme: dark){
+      .mono{ background: rgba(231,234,243,.05); }
+    }
+
+
+    .footer{
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 18px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+  </style>
+</head>
+
+
+<body>
+  <div class="app">
+    <aside id="sidebar" class="sidebar" aria-label="左側目錄">
+      <div class="brand" title="內部決策用">
+        <div class="mark" aria-hidden="true"></div>
+        <div class="meta">
+          <div class="name">Yahoo!奇摩（內部）</div>
+          <div class="sub">策略研究 × 資訊設計（離線單檔）</div>
+        </div>
+      </div>
+  <div class="controls">
+    <button class="btn icon" id="toggleSidebarBtn" aria-label="收合/展開目錄">
+      <!-- inline svg -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M4 7h16M4 12h10M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button class="btn" id="expandAllBtn" title="展開全部章節（便於搜尋）">展開全部</button>
+    <button class="btn ghost" id="collapseAllBtn" title="收合全部章節">收合全部</button>
+  </div>
+
+  <div id="tocWrap">
+    <div class="toc-title">
+      <div>
+        <div class="label">目錄（TOC）</div>
+        <div class="hint">由 H2/H3 自動生成</div>
+      </div>
+    </div>
+    <nav id="toc"></nav>
+  </div>
+</aside>
+
+<div class="content">
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="titleblock">
+        <h1><span class="hl">Jaguar 台灣 2026 H1</span>｜Yahoo!奇摩媒體策略研究（內部決策版）</h1>
+        <div class="subtitle">
+          <span class="chip purple"><b>Objective</b> 強化電動車印象 × 推動試駕預約</span>
+          <span class="chip"><b>範圍</b> 台灣市場｜Luxury Segment｜Jaguar</span>
+          <span class="chip"><b>時程</b> 2026 上半年</span>
+          <span class="chip"><b>生成日期</b> <span id="genDate">（載入中）</span></span>
+        </div>
+
+        <div class="mobile-top">
+          <button class="btn primary" id="openSidebarMobile">開啟目錄</button>
+          <button class="btn" id="closeSidebarMobile">關閉目錄</button>
+        </div>
+      </div>
+
+      <div class="right-tools">
+        <div class="searchbar" role="search" aria-label="頁內搜尋">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M21 21l-4.3-4.3m1.8-5.2a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input id="searchInput" type="search" placeholder="頁內搜尋：例如「試駕」「電動」「資料不足」「SOV」…" autocomplete="off" />
+          <button class="btn icon" id="clearSearchBtn" title="清除搜尋" aria-label="清除搜尋">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="search-meta">
+          <span class="search-count" id="searchCount">命中：0</span>
+          <button class="btn icon" id="prevHitBtn" title="上一個命中" aria-label="上一個命中">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn icon" id="nextHitBtn" title="下一個命中" aria-label="下一個命中">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="reading-nav" id="readingNav" aria-label="本頁閱讀導航（自動生成）">
+          <!-- JS auto-populate chips -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" role="main">
+    <!-- ===================== Executive Summary ===================== -->
+    <section class="section" id="sec-exec">
+      <details id="details-exec" data-persist open>
+        <summary aria-label="展開/收合：Executive Summary">
+          <div class="section-title">
+            <span class="badge purple tag">快掃｜3 分鐘掌握</span>
+            <h2>Executive Summary（內部決策用）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <p class="kicker">用途：讓 Yahoo!奇摩內部同仁在 <b>3 分鐘</b>內完成「目標 → 問題 → 決策結論」對齊。</p>
+
+          <div class="grid">
+            <div class="col-12">
+              <div class="callout note" id="anchor-objective">
+                <div class="title">
+                  <span>Objective（研究目標）</span>
+                  <span class="badge info">1–2 句</span>
+                </div>
+                <p>
+                  在 <b>2026 上半年</b>，以 Yahoo!奇摩可落地的媒體與數據能力，協助 Jaguar 在台灣市場
+                  <b>強化「電動化 / 純電豪華」品牌印象</b>，並建立可衡量的成效閉環以<b>推動試駕預約（Lead）</b>。
+                </p>
+                <p><small>註：預算未定，因此方案以「可伸縮的策略模組」呈現（可依預算擴縮）。</small></p>
+              </div>
+            </div>
+
+            <div class="col-6" id="anchor-questions">
+              <div class="card">
+                <h3>Key Questions（核心問題）</h3>
+                <ol class="list">
+                  <li>台灣市場目前如何理解 Jaguar 的全球定位（英倫豪華 / 設計 / 性能 / 電動化）？是否存在斷層或誤解？</li>
+                  <li>在豪華車競爭環境下（Mercedes-Benz / BMW / Audi / Lexus / Porsche 等），Jaguar 最可能面臨哪些溝通與轉化痛點？</li>
+                  <li>如何將痛點轉譯成 <b>可執行的溝通主軸</b>，並能對應 Yahoo!奇摩的：首頁、新聞原生、影音、品牌專題、興趣/意圖族群、跨螢聯播、內容共創？</li>
+                  <li>在「產品轉型 / 車款斷檔」風險下，如何避免市場誤解（例如：品牌消失）並維持聲量？<small>（資料來源含市場報導引用，需再核對）</small></li>
+                  <li>在不確定預算條件下，優先投資哪個漏斗階段最能同時做到「EV 印象」與「試駕 Lead」？</li>
+                </ol>
+              </div>
+            </div>
+
+            <div class="col-6" id="anchor-decision">
+              <div class="card">
+                <h3>Most Critical Points（最關鍵結論 / 決策判斷）</h3>
+                <ul class="list">
+                  <li><b>品牌認知斷層</b>：Jaguar 全球重塑與電動化轉型訊息，在台灣容易被「低能見度＋產品斷檔」噪音覆蓋，需先完成「品牌回來了」的認知修復。<small>（依深研內文：全球 Reimagine 與銷售斷檔資訊；台灣實際認知需補調查）</small></li>
+                  <li><b>EV 可信度要補課</b>：若目標是 EV 印象與試駕轉化，必須以「技術背書＋體驗內容」共同降低不信任與陌生感。<small>（依內文：技術型內容對高意圖 EV 受眾有效；需補：台灣受眾驗證）</small></li>
+                  <li><b>差異化要更尖銳</b>：在德系/日系主流框架下，Jaguar需要把「英倫設計×性能血統×稀有」轉成可被理解的購買理由（Why Jaguar），而非泛泛而談奢華。</li>
+                  <li><b>Yahoo 可做全漏斗</b>：入口級曝光（首頁/新聞）→ 深度教育（原生/影音/專題）→ 高意圖收單（興趣/意圖+表單+跨螢追投）形成閉環，否則只做曝光很難落到試駕名單。</li>
+                  <li><b>資料不足風險</b>：台灣 Jaguar 銷售、市佔、經銷覆蓋、歷史投放成效缺乏可引用公開數據；決策前需定義最小必要數據包，避免結論跳躍。</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="callout risk">
+                <div class="title">
+                  <span>風險提示（資料不足 / 推測）</span>
+                  <span class="badge warn">請勿腦補</span>
+                </div>
+                <p>
+                  本研究的部分判斷（例如：台灣 Jaguar 年銷量量級、市佔、德系品牌市佔比例、經銷跟進效率）
+                  在原文中為<b>推測或資料不足</b>。本頁已用「證據強度」標示，並在「待補資料清單」列出補強需求。
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="imp">
+            <b>所以呢？（Implication）</b>
+            <span class="muted">內部決策應優先回答兩件事：</span>
+            <ul class="list">
+              <li><b>先修復認知，再收單</b>：若品牌認知仍破碎，單純投轉換會導致 CPL 偏高、名單品質不穩。</li>
+              <li><b>建立最小必要數據包</b>：沒有台灣端真實銷售/名單/到店率，方案很難精準估 ROI；先補資料再定投資強度。</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 背景與範圍 ===================== -->
+    <section class="section" id="sec-scope">
+      <details id="details-scope" data-persist>
+        <summary aria-label="展開/收合：研究背景與範圍">
+          <div class="section-title">
+            <span class="badge">研究設定</span>
+            <h2>1. 研究背景與範圍（Scope & Guardrails）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-8">
+              <div class="card">
+                <h3>研究使用情境（內部決策）</h3>
+                <ul class="list">
+                  <li><b>受眾</b>：Yahoo!奇摩內部同仁（業務/策略/產品/內容/投放）。</li>
+                  <li><b>用途</b>：媒體提案對齊、策略取捨、資源配置（而非對外提案稿）。</li>
+                  <li><b>成功定義</b>：EV 印象的品牌教育 + 可量化的試駕名單（Lead）提升。</li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">本頁的設計目標不是「寫得漂亮」，而是讓內部能快速做：投資哪裡、為何、如何衡量。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-4">
+              <div class="card">
+                <h3>不可忽略的限制</h3>
+                <ul class="list">
+                  <li><b>預算未定</b> → 方案需模組化（可擴縮）。</li>
+                  <li><b>時程</b>：2026 上半年。</li>
+                  <li><b>資料限制</b>：台灣 Jaguar 市佔/銷售/投放成效多為資料不足 → 必須先補。</li>
+                  <li><b>落地要求</b>：必須能對應 Yahoo!奇摩版位、內容與數據方案。</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="callout">
+                <div class="title">
+                  <span>核心輸出（本頁包含）</span>
+                  <span class="badge purple">IA：快掃 + 深讀</span>
+                </div>
+                <ul class="list">
+                  <li>背景 / 市場 / 競品 / 用戶洞察（推測）</li>
+                  <li>行銷難題（痛點拆解：現況→原因→投放影響）</li>
+                  <li>策略選項（2–4）與取捨表</li>
+                  <li>Yahoo 落地模組（對應版位、內容、受眾、跨螢）</li>
+                  <li>證據強度評估 + 待補資料清單</li>
+                  <li>附錄：原文保留、術語表</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 品牌 / 產品 / 轉型脈絡 ===================== -->
+    <section class="section" id="sec-brand">
+      <details id="details-brand" data-persist>
+        <summary aria-label="展開/收合：品牌與產品脈絡">
+          <div class="section-title">
+            <span class="badge">背景</span>
+            <h2>2. 客戶背景：Jaguar 轉型脈絡與台灣產品線</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-12">
+              <div class="card">
+                <h3>全球定位（Reimagine / 電動化轉型）</h3>
+                <ul class="list">
+                  <li><b>定位關鍵字</b>：英倫豪華、設計導向、性能血統、電動化轉型。<small>（內文引用：全球 Reimagine 與品牌重塑資訊；需保留原始來源核對）</small></li>
+                  <li><b>轉型策略</b>：以純電豪華為核心，重塑品牌識別與傳播語言。<small>（內文提及：Logo 更新與「Copy Nothing」主張；來源需核對）</small></li>
+                  <li><b>短期副作用</b>：產品線調整與車款停產可能造成市場「消失」誤解。<small>（內文引用：部分市場銷量下滑；台灣狀況需補）</small></li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">在台灣要先完成「品牌仍在、且正在變強」的認知修復，否則電動化主張容易被忽略。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <h3>台灣產品線（以原文列舉為主）</h3>
+                <ul class="list">
+                  <li><b>SUV</b>：F-Pace、E-Pace <small>（來源：內文引用台灣官網車系清單；需實際官網核對）</small></li>
+                  <li><b>跑車</b>：F-Type</li>
+                  <li><b>EV（純電）</b>：I-Pace <small>（內文引用 I-Pace 售價約 298 萬起；需補：實際在台報價與促案）</small></li>
+                </ul>
+                <div class="callout risk" style="margin-top:12px;">
+                  <div class="title"><span>資料不足</span><span class="badge warn">需補強</span></div>
+                  <p>2026 上半年「實際在售 / 主推」車款、販促（金融/保固/充電方案）未在原文形成可核對清單。</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <h3>價格帶（原文資訊＋風險註記）</h3>
+                <ul class="list">
+                  <li>I-Pace 起價約 <b>298 萬</b>（原文引用）。</li>
+                  <li>F-Pace 依版本約 280–500+ 萬（原文引用，含高性能版本）。</li>
+                  <li>未來新世代 EV 可能上移至更高價位（原文引用）。</li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">若價格帶上移，受眾會更高資產、更重視權威背書與圈層認同；但現階段台灣真實定價與配套仍需補。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3 id="h-audience">目標族群輪廓（推測，需驗證）</h3>
+                <div class="grid">
+                  <div class="col-6">
+                    <ul class="list">
+                      <li><b>年齡</b>：35–55 為主；若產品升級，可能下探 30–45 新貴（推測）。</li>
+                      <li><b>資產/收入</b>：中高資產、可負擔 280–500+ 萬級距（推測）。</li>
+                      <li><b>生活型態</b>：設計品味、精品旅遊、圈層社交（推測）。</li>
+                    </ul>
+                  </div>
+                  <div class="col-6">
+                    <ul class="list">
+                      <li><b>對德系主流豪華的距離</b>：可能是既有車主尋求差異化第二台車（推測）。</li>
+                      <li><b>EV 心態</b>：對科技有好奇但擔心可信度/維修/保值（推測）。</li>
+                      <li><b>內容偏好</b>：高意圖階段更吃「專業評測/技術背書」而非娛樂內容（原文引用）。</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="callout risk" style="margin-top:12px;">
+                  <div class="title"><span>推測標示</span><span class="badge warn">需用數據驗證</span></div>
+                  <p>以上受眾輪廓為根據車型/價位的推測。若要投放精準，需補：Yahoo 站內行為、第三方車主特徵、試駕名單分析等。</p>
+                </div>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">投放前要先把「誰最可能預約試駕」變成可操作的人群規格（意圖訊號、興趣、排除條件）。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 市場與競品 ===================== -->
+    <section class="section" id="sec-market">
+      <details id="details-market" data-persist>
+        <summary aria-label="展開/收合：市場與競品">
+          <div class="section-title">
+            <span class="badge">市場</span>
+            <h2>3. 台灣豪華車市場與競品格局（質化判斷＋資料缺口）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-12">
+              <div class="callout note">
+                <div class="title">
+                  <span>資料現況</span>
+                  <span class="badge info">先講清楚</span>
+                </div>
+                <p>
+                  原文對台灣豪華車「精準市佔/銷售」多未提供可核對數據，因此本章以<b>質化格局</b>為主；
+                  需要量化時，請見「待補資料清單」。
+                </p>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3>競爭環境：主流豪華 vs 高端性能/電動</h3>
+                <ul class="list">
+                  <li><b>主流豪華</b>：Mercedes-Benz / BMW / Audi / Lexus（品牌資產強、產品線廣、投放量級大）。</li>
+                  <li><b>高端性能/心佔</b>：Porsche（性能與品味心佔）。</li>
+                  <li><b>電動先鋒/科技認知</b>：Tesla（非傳統豪華但搶走 EV 心智）。</li>
+                  <li><b>Jaguar 風險</b>：被夾擊而「定位模糊」，需要更尖銳的差異化敘事。</li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">Jaguar 不能用「我也很豪華」來打主流；必須用「我豪華的方式不一樣」來打差異。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <table class="table" aria-label="競品溝通長板與對Jaguar的含義">
+                <thead>
+                  <tr>
+                    <th>競品</th>
+                    <th>常見心智 / 長板（質化）</th>
+                    <th>對 Jaguar 的壓力</th>
+                    <th>可反制的切角（示例）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Mercedes-Benz</b></td>
+                    <td>傳統豪華＋科技；聲量強（原文引用：搜尋份額/SOV 數字，需核對）</td>
+                    <td>消費者預設選項；難搶心智</td>
+                    <td>用「英倫設計/稀有」建立替代心智</td>
+                  </tr>
+                  <tr>
+                    <td><b>BMW</b></td>
+                    <td>駕馭樂趣＋運動性能；電動化布局逐步強（原文引用）</td>
+                    <td>性能認知壓過 Jaguar</td>
+                    <td>把「性能血統」落到可體驗（試駕內容）</td>
+                  </tr>
+                  <tr>
+                    <td><b>Audi</b></td>
+                    <td>科技感＋設計；偏理性科技訴求</td>
+                    <td>把設計主張「吃掉」</td>
+                    <td>強調「設計哲學與文化」而非單點功能</td>
+                  </tr>
+                  <tr>
+                    <td><b>Lexus</b></td>
+                    <td>可靠＋售後信任；原文引用：特定渠道聲量（需核對）</td>
+                    <td>信任壁壘；轉單難</td>
+                    <td>用「權威背書＋透明承諾」降低風險感</td>
+                  </tr>
+                  <tr>
+                    <td><b>Porsche</b></td>
+                    <td>性能/品味心佔；高端EV（Taycan）建立形象</td>
+                    <td>高資產客群上移時直接競爭</td>
+                    <td>打造「英倫電動GT」故事（願景＋預告）</td>
+                  </tr>
+                  <tr>
+                    <td><b>Tesla</b></td>
+                    <td>科技先鋒、充電網路/社群聲量（原文引用）</td>
+                    <td>EV 心智被搶走</td>
+                    <td>強調「豪華質感＋設計美學」差異</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="imp">
+                <b>所以呢？</b>
+                <span class="muted">競品教育市場已久，Jaguar 必須選擇「最能贏」的 1–2 個核心賣點持續講，避免訊息發散。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 用戶洞察 / 決策旅程 ===================== -->
+    <section class="section" id="sec-insights">
+      <details id="details-insights" data-persist>
+        <summary aria-label="展開/收合：用戶洞察與決策旅程">
+          <div class="section-title">
+            <span class="badge">洞察</span>
+            <h2>4. 用戶洞察：決策旅程與內容偏好（含推測）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-12">
+              <div class="card">
+                <h3>決策旅程更長、更碎片化（與試駕轉化直接相關）</h3>
+                <ul class="list">
+                  <li>消費者在做決策前，平均會接觸多個線上線下資訊點（原文引用：<b>7–12 個接點</b>）。</li>
+                  <li>Google 搜尋仍是重要入口，但年輕族群也會在社群/論壇探索（原文引用）。</li>
+                  <li>這意味著：只投放單一媒體或只做曝光，往往不足以推動高單價決策。</li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">Yahoo 的角色應設計為「旅程中的多接點」，同時兼顧高到達與高意圖收單。</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <h3>高單價/EV 類別的內容偏好（原文引用 + 待驗證）</h3>
+                <ul class="list">
+                  <li><b>高意圖</b>：偏好「專業評測 / 技術解釋 / 可信背書」內容。</li>
+                  <li><b>低意圖</b>：可用生活風格/設計美學引起好奇。</li>
+                  <li><b>推測</b>：Jaguar 的可行路徑是「先用設計/英倫吸引 → 再用技術/試駕降低風險」。</li>
+                </ul>
+                <div class="callout risk" style="margin-top:12px;">
+                  <div class="title"><span>推測</span><span class="badge warn">需驗證</span></div>
+                  <p>台灣 Jaguar 受眾是否與「技術型內容偏好」高度一致，需用 Yahoo 站內行為與過往投放成效驗證。</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <h3>信任與隱私敏感度（對名單蒐集很關鍵）</h3>
+                <ul class="list">
+                  <li>消費者對「過度索取個資」反感（原文引用）。</li>
+                  <li>因此表單設計需：<b>最小欄位</b>、清楚告知用途、提供取消/修改管道。</li>
+                  <li>名單品質比數量更重要：以「可聯絡＋可到店」為優先。</li>
+                </ul>
+                <div class="imp">
+                  <b>所以呢？</b>
+                  <span class="muted">Yahoo 若協助 lead form，需用 UX 設計降低反感、提升完成率與有效性。</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 行銷難題 ===================== -->
+    <section class="section" id="sec-challenges">
+      <details id="details-challenges" data-persist>
+        <summary aria-label="展開/收合：行銷難題">
+          <div class="section-title">
+            <span class="badge">痛點</span>
+            <h2>5. 行銷難題（Marketing Challenges）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <p class="kicker">格式：<b>現況 → 造成原因 → 對行銷/媒體投放的影響</b>（每點都要能指向 Yahoo 可落地的解法）。</p>
+
+          <div class="cards">
+            <div class="card">
+              <h3>痛點 1｜品牌認知斷層（過往形象 vs 新定位）</h3>
+              <p><b>現況：</b>台灣對 Jaguar「正在電動化重塑」的理解不足，容易被低能見度/斷檔噪音覆蓋。</p>
+              <p><b>原因：</b>小眾品牌＋訊息前衛抽象＋台灣端缺乏持續教育內容（原文論述）。</p>
+              <p><b>影響：</b>若直接推轉換，CPL 可能偏高、名單品質不穩；需先做認知修復與信任建立。</p>
+              <div class="row">
+                <span class="badge warn">風險：資料不足（台灣認知需調查）</span>
+                <span class="badge info">可落地：首頁 / 新聞原生 / 專題</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>痛點 2｜競品強勢框架下存在感不足</h3>
+              <p><b>現況：</b>德系/日系品牌心智牢固，Jaguar 容易被忽略或淪為備案。</p>
+              <p><b>原因：</b>品牌標籤不夠尖銳、產品線精簡、缺少可被記住的「Why Jaguar」。</p>
+              <p><b>影響：</b>投放若訊息發散，會被競品敘事吞沒；需選 1–2 個核心差異點反覆講。</p>
+              <div class="row">
+                <span class="badge warn">風險：需要量化競品聲量/份額核對</span>
+                <span class="badge info">可落地：內容共創 / 興趣族群</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>痛點 3｜電動化形象薄弱（科技信任未建立）</h3>
+              <p><b>現況：</b>Jaguar 未被視為 EV 代表；受眾對續航/充電/維修等仍有疑慮（原文）。</p>
+              <p><b>原因：</b>缺乏連續的技術背書與使用案例內容；市場教育被 Tesla/BBA 主導。</p>
+              <p><b>影響：</b>必須用「技術 + 生活場景」雙線內容，降低陌生與風險感。</p>
+              <div class="row">
+                <span class="badge warn">風險：需補台灣 EV 受眾關切點（調查/關鍵字）</span>
+                <span class="badge info">可落地：影音 / 原生 / KOL 評測</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>痛點 4｜試駕轉化困難（最後一哩未閉環）</h3>
+              <p><b>現況：</b>展間/據點有限＋線上流程不夠強勢導流 → 試駕名單不足或到店率低（原文推論）。</p>
+              <p><b>原因：</b>缺乏「去試一次」的強誘因、缺少跨螢追投、經銷跟進效率未知（資料不足）。</p>
+              <p><b>影響：</b>需要站內表單/落地頁/再行銷，把曝光變成可追 KPI 的 lead。</p>
+              <div class="row">
+                <span class="badge warn">資料不足：到店率/成交率/跟進 SLA</span>
+                <span class="badge info">可落地：興趣/意圖 + 表單 + 跨螢</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="imp">
+            <b>所以呢？</b>
+            <span class="muted">四大痛點可收斂成一條策略鏈：</span>
+            <ul class="list">
+              <li><b>先讓人知道 Jaguar 的新定位</b>（認知修復）</li>
+              <li><b>再讓人相信它的 EV 能力</b>（可信度）</li>
+              <li><b>最後把相信的人導到試駕</b>（轉化閉環）</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 關鍵結論卡片（決策用） ===================== -->
+    <section class="section" id="sec-critical">
+      <details id="details-critical" data-persist>
+        <summary aria-label="展開/收合：關鍵結論卡片">
+          <div class="section-title">
+            <span class="badge purple">決策卡片</span>
+            <h2>6. 關鍵結論（Decision Cards）＋證據強度</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <p class="kicker">每張卡片都包含：<b>結論</b> / <b>對 Yahoo 決策意義</b> / <b>建議行動</b> / <b>證據強度</b>（高/中/低）＋需要補的資料。</p>
+
+          <div class="cards">
+            <div class="card">
+              <h3>結論 1｜台灣市場需要「品牌回來了」的認知修復</h3>
+              <p><b>結論：</b>在產品轉型與訊息前衛化背景下，Jaguar 在台灣容易被誤解為低活躍或斷檔，需要先用入口級曝光完成認知修復，再談 EV 教育與轉化。</p>
+              <p><b>影響（對 Yahoo）：</b>投資順序要「上層漏斗先行」：首頁/新聞/專題先把品牌重新放回選擇集合，否則下層轉換成本偏高。</p>
+              <p><b>建議行動：</b>以 4–6 週「品牌回歸」burst：首頁焦點＋新聞原生系列＋品牌專題館（含新定位與轉型脈絡）。</p>
+              <div class="row">
+                <span class="badge ok">證據強度：中</span>
+                <span class="badge info">依據：原文全球轉型/斷檔描述（需核對原始來源）</span>
+                <span class="badge warn">待補：台灣端品牌認知調研</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>結論 2｜EV 印象要靠「技術背書 + 體驗內容」雙軌</h3>
+              <p><b>結論：</b>若目標是 EV 印象與試駕名單，單靠形象廣告不足；需要用專業解說（續航/充電/可靠性）＋試駕內容（場景/情緒價值）共同降低風險感。</p>
+              <p><b>影響（對 Yahoo）：</b>Yahoo 需同時提供「內容製作能力」與「意圖受眾投放」：原生/影音/KOL 評測 + 興趣/意圖重定向。</p>
+              <p><b>建議行動：</b>建立 EV 教育內容矩陣（FAQ、技術短片、車主故事）並串到試駕 CTA。</p>
+              <div class="row">
+                <span class="badge ok">證據強度：中</span>
+                <span class="badge info">依據：原文指出高意圖偏好技術內容（需台灣驗證）</span>
+                <span class="badge warn">待補：台灣 EV 顧慮點/關鍵字、歷史內容成效</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>結論 3｜差異化主張要更尖：英倫設計 × 性能血統 × 稀有</h3>
+              <p><b>結論：</b>Jaguar 若用泛泛「豪華」對打主流品牌會輸；要把英倫設計、性能血統、稀有度轉成可理解的「Why Jaguar」購買理由。</p>
+              <p><b>影響（對 Yahoo）：</b>訊息策略要聚焦，避免同時講太多；用內容把差異講深（而不是只喊口號）。</p>
+              <p><b>建議行動：</b>兩條核心訊息線：①英倫設計美學（生活風格）②電動性能/賽道血統（技術與體驗）。</p>
+              <div class="row">
+                <span class="badge warn">證據強度：低</span>
+                <span class="badge warn">原因：多為質化判斷，缺乏台灣端量化驗證</span>
+                <span class="badge info">待補：品牌聯想測試、競品訊息 mapping</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>結論 4｜Yahoo 需做「全漏斗閉環」，否則難以推試駕</h3>
+              <p><b>結論：</b>高單價車購買旅程接點多（原文引用 7–12 接點），因此必須把曝光、教育、收單、再行銷串起來，才能把聲量轉成試駕名單。</p>
+              <p><b>影響（對 Yahoo）：</b>提案需明確賣「跨版位 + 跨螢 + 受眾 + 內容」整合，而不只是單點版位。</p>
+              <p><b>建議行動：</b>用「品牌專題館」做內容中樞，外圍以首頁/新聞導流；下層以意圖族群 + 表單收單；跨螢追投補轉化。</p>
+              <div class="row">
+                <span class="badge ok">證據強度：高</span>
+                <span class="badge info">依據：原文引用決策旅程接點（7–12）</span>
+                <span class="badge warn">待補：Yahoo 自家車類投放 Benchmarks（CTR/CVR/CPL）</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>結論 5｜成效要用「試駕漏斗」定義，並要求 CRM 回拋</h3>
+              <p><b>結論：</b>以試駕預約為目標時，KPI 不應停在點擊/填單；必須追到「可聯絡」與「到店」甚至「成交」。</p>
+              <p><b>影響（對 Yahoo）：</b>提案需帶出資料回拋機制（SLA、去重、品質判定），避免成效被低品質名單稀釋。</p>
+              <p><b>建議行動：</b>定義最小 KPI：曝光→內容互動→表單→有效名單→到店→成交（至少回拋到「到店」）。</p>
+              <div class="row">
+                <span class="badge ok">證據強度：中</span>
+                <span class="badge info">依據：高單價決策常規（原文推論）</span>
+                <span class="badge warn">待補：經銷跟進 SLA、到店率、成交率、名單有效定義</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>結論 6｜台灣端核心數據缺口會直接影響提案可信度</h3>
+              <p><b>結論：</b>若沒有台灣 Jaguar 的銷售/市佔/受眾/投放歷史，容易造成「結論跳躍」。</p>
+              <p><b>影響（對 Yahoo）：</b>內部需先建立「最小必要資料包」，才能把提案變成可承諾的商業方案。</p>
+              <p><b>建議行動：</b>先用 2 週時間補齊：台灣報價/車款、經銷網、歷史投放與名單、品牌關鍵字與競品份額。</p>
+              <div class="row">
+                <span class="badge warn">證據強度：低</span>
+                <span class="badge warn">原因：原文多處標示資料不足</span>
+                <span class="badge info">待補：見「待補資料清單」</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="imp">
+            <b>所以呢？</b>
+            <span class="muted">內部決策建議先回答：</span>
+            <ul class="list">
+              <li>我們願意承接到哪個 KPI 層級？（填單 / 有效名單 / 到店）</li>
+              <li>若客戶目前缺資料，Yahoo 要不要提供「資料補齊」作為前置顧問服務？</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 策略選項（Options） ===================== -->
+    <section class="section" id="sec-options">
+      <details id="details-options" data-persist>
+        <summary aria-label="展開/收合：策略選項">
+          <div class="section-title">
+            <span class="badge">Options</span>
+            <h2>7. 策略選項（2–4）與取捨比較</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <p class="kicker">目的：在預算不確定下，給內部一套「可選的投資路徑」，並清楚說出適用情境、優缺點、風險。</p>
+
+          <table class="table" aria-label="策略選項比較">
+            <thead>
+              <tr>
+                <th style="width:16%;">選項</th>
+                <th>策略核心</th>
+                <th style="width:22%;">適用情境</th>
+                <th style="width:22%;">優點</th>
+                <th style="width:22%;">缺點 / 風險</th>
+                <th style="width:18%;">核心KPI</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Option A</b><br><span class="badge purple">先認知</span></td>
+                <td>以「品牌回歸＋EV 重塑」為先，建立 Jaguar 新定位的可理解敘事（入口級曝光＋專題內容）。</td>
+                <td>品牌認知破碎、產品斷檔造成誤解，需先把 Jaguar 放回選擇集合。</td>
+                <td>提升基礎聲量與好感，為後續轉化降低成本；可做成可擴縮 burst。</td>
+                <td>短期名單不一定立刻大幅成長；需避免只做形象不落地。</td>
+                <td><code>Reach</code><br><code>Content Eng.</code><br><code>Brand Lift</code></td>
+              </tr>
+
+              <tr>
+                <td><b>Option B</b><br><span class="badge purple">先EV可信</span></td>
+                <td>技術背書與評測內容優先：續航/充電/可靠性/性能，以專業內容建立 EV 信任。</td>
+                <td>目標客群理性、風險敏感，或競品 EV 教育強勢（Tesla/BBA）。</td>
+                <td>更貼近「高意圖」需求，對試駕轉化更直接；利於建立長內容資產。</td>
+                <td>若品牌基礎認知太低，內容可能觸達不足；需配合導流與分眾。</td>
+                <td><code>Video VTR</code><br><code>Time Spent</code><br><code>Intent Lift</code></td>
+              </tr>
+
+              <tr>
+                <td><b>Option C</b><br><span class="badge purple">先收單</span></td>
+                <td>以意圖族群＋站內表單＋跨螢追投，直接衝試駕 lead（同時用短內容補教育）。</td>
+                <td>短期 KPI 壓力大，客戶急需名單；且經銷跟進能力可靠（需驗證）。</td>
+                <td>最快看到 lead 數字；可建立 CRM 回拋模型，形成可優化的閉環。</td>
+                <td>品牌認知不足時 CPL 易偏高；名單品質風險；若無回拋則難證明 ROI。</td>
+                <td><code>Leads</code><br><code>CPL</code><br><code>Show-up</code></td>
+              </tr>
+
+              <tr>
+                <td><b>Option D</b><br><span class="badge purple">圈層口碑</span></td>
+                <td>用車主/圈層故事共創，提高信任與稀有感（偏中長期）。</td>
+                <td>品牌小眾、靠口碑驅動；想建立「懂的人自然懂」的心佔。</td>
+                <td>能建立長期資產與信任壁壘；內容有機擴散可能性高。</td>
+                <td>成效較慢；需要車主資源與社群運營；短期 lead 不保證。</td>
+                <td><code>Share</code><br><code>Community</code><br><code>Organic Lift</code></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout risk" style="margin-top:12px;">
+            <div class="title">
+              <span>關鍵決策問題</span>
+              <span class="badge warn">必答</span>
+            </div>
+            <p>
+              在 2026 H1 要同時做到「EV 印象」與「試駕名單」，最常見的組合是 <b>Option A（認知）＋ Option C（收單）</b>：
+              先做 4–6 週 burst 修復認知，再用意圖族群持續收單；但前提是經銷回拋資料可用。
+            </p>
+          </div>
+
+          <div class="imp">
+            <b>所以呢？</b>
+            <span class="muted">建議內部先決定提案主架構：</span>
+            <ul class="list">
+              <li><b>保守路線</b>：A → B → C（先建立信任，再追名單）</li>
+              <li><b>進攻路線</b>：A + C 並行（但必須有 CRM 回拋與品質控管）</li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== Yahoo 落地模組 ===================== -->
+    <section class="section" id="sec-yahoo">
+      <details id="details-yahoo" data-persist>
+        <summary aria-label="展開/收合：Yahoo落地機會">
+          <div class="section-title">
+            <span class="badge">落地</span>
+            <h2>8. Yahoo!奇摩機會：溝通主軸 × 方案模組 × 成效衡量</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <p class="kicker">原文提出 3 個主軸（品牌回歸 / 差異化 / 試駕轉化），此處將其整理成「可提案的模組化方案」。</p>
+
+          <div class="grid">
+            <div class="col-12">
+              <div class="card">
+                <h3>溝通主軸 1｜Jaguar 全電新紀元（品牌回歸 + EV 定位）</h3>
+                <ul class="list">
+                  <li><b>Insight</b>：市場可能存在認知斷層；需先把「Jaguar 正在重塑」講清楚。</li>
+                  <li><b>欲改變心態</b>：從「很久沒看到 Jaguar」→「Jaguar 正要變強，而且是純電豪華」。</li>
+                  <li><b>內容方向</b>：品牌故事、設計哲學、轉型脈絡、未來 EV 預告（避免空泛）。</li>
+                  <li><b>Yahoo 對應</b>：首頁（Reach）＋新聞原生（理解）＋品牌專題（中樞）＋影音（記憶）。</li>
+                </ul>
+                <div class="imp"><b>衡量</b>：曝光 / 停留時間 / 完播率 / 品牌提及或 Brand Lift（若可做）。</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3>溝通主軸 2｜與眾不同的豪華：英倫設計 × 稀有圈層（差異化）</h3>
+                <ul class="list">
+                  <li><b>Insight</b>：主流豪華已同質化，部分高資產受眾尋求「不跟風」。</li>
+                  <li><b>欲改變心態</b>：從「Jaguar 不熟」→「Jaguar 是品味更尖的選擇」。</li>
+                  <li><b>內容方向</b>：設計美學、英倫生活方式、車主故事（但需避免誇張腦補）。</li>
+                  <li><b>Yahoo 對應</b>：品味/生活內容共創、論壇話題、興趣族群定向。</li>
+                </ul>
+                <div class="imp"><b>衡量</b>：互動率、分享率、收藏/回訪、意圖族群擴張（需內部定義）。</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3>溝通主軸 3｜試駕 Jaguar：電驅激情零距離（轉化閉環）</h3>
+                <ul class="list">
+                  <li><b>Insight</b>：豪華車最終靠體驗，必須把曝光變成可追的試駕名單。</li>
+                  <li><b>欲改變行為</b>：從「看看就好」→「立即預約試駕」。</li>
+                  <li><b>內容方向</b>：試駕誘因、評測短片、試駕日紀錄、FAQ（續航/充電/維修）。</li>
+                  <li><b>Yahoo 對應</b>：意圖族群投放 + 站內表單（或專屬落地頁）+ 跨螢追投 + 成效回拋。</li>
+                </ul>
+                <div class="imp"><b>衡量</b>：Leads / CPL / 有效名單率 / 到店率（至少回拋到到店）。</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <table class="table" aria-label="漏斗KPI對應表">
+                <thead>
+                  <tr>
+                    <th>漏斗階段</th>
+                    <th>目的</th>
+                    <th>Yahoo 可用模組</th>
+                    <th>核心KPI</th>
+                    <th>備註（風險/依賴）</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Awareness</b></td>
+                    <td>把 Jaguar 新定位放回選擇集合</td>
+                    <td>首頁焦點、新聞曝光、跨螢聯播</td>
+                    <td>Reach、頻次、Share of Voice（若可量測）</td>
+                    <td>若不搭配內容，易被快速遺忘</td>
+                  </tr>
+                  <tr>
+                    <td><b>Consideration</b></td>
+                    <td>建立 EV 可信度、降低風險感</td>
+                    <td>新聞原生、影音、品牌專題、內容共創</td>
+                    <td>Time Spent、VTR、互動率</td>
+                    <td>需有足夠內容深度與權威背書</td>
+                  </tr>
+                  <tr>
+                    <td><b>Intent</b></td>
+                    <td>鎖定高意圖族群</td>
+                    <td>興趣/意圖受眾、再行銷（跨裝置）</td>
+                    <td>CTR、Landing CVR</td>
+                    <td>需內部/客戶確認意圖定義與排除條件</td>
+                  </tr>
+                  <tr>
+                    <td><b>Action</b></td>
+                    <td>收試駕名單（Lead）</td>
+                    <td>站內表單/落地頁、原生CTA</td>
+                    <td>Leads、CPL、有效名單率</td>
+                    <td>個資敏感，表單欄位需最小化</td>
+                  </tr>
+                  <tr>
+                    <td><b>Offline</b></td>
+                    <td>到店與成交</td>
+                    <td>回拋資料、優化投放</td>
+                    <td>Show-up、成交率（如可）</td>
+                    <td><b>高度依賴經銷回拋</b>（資料不足）</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="imp">
+                <b>所以呢？</b>
+                <span class="muted">提案時要把 Yahoo 方案講成「可追 KPI 的系統」，而不是「我有很多版位」。</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 證據強度與待補資料 ===================== -->
+    <section class="section" id="sec-evidence">
+      <details id="details-evidence" data-persist>
+        <summary aria-label="展開/收合：證據強度與待補資料">
+          <div class="section-title">
+            <span class="badge">Evidence</span>
+            <h2>9. 證據強度（Evidence Strength）與待補資料清單</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-12">
+              <div class="card">
+                <h3>證據強度判準（本頁採用）</h3>
+                <ul class="list">
+                  <li><span class="badge ok">高</span>：原文有明確資料/引用、或可直接由可核對來源支持（例如：平台報告、官網車系）。</li>
+                  <li><span class="badge ok">中</span>：原文有合理論述/部分引用，但仍需台灣端驗證或方法說明（例如：SOV、內容偏好）。</li>
+                  <li><span class="badge warn">低</span>：原文缺乏可核對數據，或屬推測/常識性推論（例如：台灣銷量、市佔、到店率）。</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="callout risk">
+                <div class="title">
+                  <span>待補資料清單（建議 2 週內補齊）</span>
+                  <span class="badge warn">否則提案風險高</span>
+                </div>
+                <ul class="list">
+                  <li><b>台灣端產品/價格</b>：2026H1 實際在售車款、建議售價、促案（金融/保固/充電配套）。</li>
+                  <li><b>通路/服務</b>：展間/維修據點分布、試駕資源、服務承諾（影響信任與轉化）。</li>
+                  <li><b>市場表現</b>：近 12–24 月台灣 Jaguar 掛牌/銷量、與主要競品比較（如無則明示資料不足）。</li>
+                  <li><b>受眾資料</b>：現有車主/名單的基本輪廓（年齡/地區/購車動機），Yahoo 站內興趣/意圖訊號對照。</li>
+                  <li><b>歷史投放</b>：過去 6–12 月所有數位投放花費、版位、素材、成效（CTR/CVR/CPL/到店）。</li>
+                  <li><b>CRM 回拋機制</b>：名單有效定義、跟進 SLA、到店/成交回拋頻率與欄位（去重規則）。</li>
+                  <li><b>競品聲量</b>：SOV/Share 的計算方式、期間、平台（避免拿錯比較基準）。</li>
+                </ul>
+                <p><small>補齊後即可把「選項」收斂成可承諾 KPI 的方案與預算級距。</small></p>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <table class="table" aria-label="關鍵結論的證據強度一覽">
+                <thead>
+                  <tr>
+                    <th>關鍵結論</th>
+                    <th>證據強度</th>
+                    <th>主要依據（原文）</th>
+                    <th>仍需補的資料</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>品牌回歸/認知修復必要</td>
+                    <td><span class="badge ok">中</span></td>
+                    <td>全球轉型、產品斷檔/能見度下降（引用需核對）</td>
+                    <td>台灣品牌認知調查、近半年聲量趨勢</td>
+                  </tr>
+                  <tr>
+                    <td>EV 可信度需技術+體驗雙軌</td>
+                    <td><span class="badge ok">中</span></td>
+                    <td>原文主張技術內容對高意圖有效（需台灣驗證）</td>
+                    <td>台灣 EV 顧慮點、內容成效 benchmark</td>
+                  </tr>
+                  <tr>
+                    <td>差異化要聚焦英倫/設計/稀有</td>
+                    <td><span class="badge warn">低</span></td>
+                    <td>質化推論</td>
+                    <td>訊息測試、競品訊息地圖、品牌聯想調研</td>
+                  </tr>
+                  <tr>
+                    <td>Yahoo 全漏斗閉環是必要解法</td>
+                    <td><span class="badge ok">高</span></td>
+                    <td>決策旅程接點多（原文引用）</td>
+                    <td>Yahoo 車類投放轉化 benchmark、回拋可行性</td>
+                  </tr>
+                  <tr>
+                    <td>必須追到到店（不只填單）</td>
+                    <td><span class="badge ok">中</span></td>
+                    <td>高單價決策常規（推論）</td>
+                    <td>經銷跟進 SLA、到店/成交回拋資料</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="imp">
+                <b>所以呢？</b>
+                <span class="muted">內部若要提高提案命中率，應把「補數據」包裝成前置服務或提案前置工作坊。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== 建議下一步 ===================== -->
+    <section class="section" id="sec-next">
+      <details id="details-next" data-persist>
+        <summary aria-label="展開/收合：下一步建議">
+          <div class="section-title">
+            <span class="badge">Next</span>
+            <h2>10. 建議下一步（內部行動清單）</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-6">
+              <div class="card">
+                <h3>0–2 週｜把資料補齊（避免提案空轉）</h3>
+                <ul class="list">
+                  <li>向客戶/代理商索取：在售車款/價格/促案、經銷與試駕資源、CRM 回拋可行性。</li>
+                  <li>內部拉數：Yahoo 站內「豪華車/EV」興趣與意圖訊號，並盤點可用版位模組。</li>
+                  <li>確認 KPI 層級：最少要回拋到「有效名單」或「到店」。</li>
+                </ul>
+                <div class="imp"><b>交付物</b>：最小必要資料包（含 KPI 定義與回拋欄位）。</div>
+              </div>
+            </div>
+
+            <div class="col-6">
+              <div class="card">
+                <h3>2–4 週｜做策略與創意原型（可快速迭代）</h3>
+                <ul class="list">
+                  <li>先做一版「A + C 並行」的提案骨架（品牌回歸 burst + 意圖收單 always-on）。</li>
+                  <li>準備 2 套訊息路線：設計/英倫（感性） vs 技術/性能（理性）。</li>
+                  <li>定義落地頁/表單 UX（最小欄位 + 隱私告知）。</li>
+                </ul>
+                <div class="imp"><b>交付物</b>：可對外溝通的提案結構＋素材方向版型。</div>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3>4–12 週｜投放與優化閉環</h3>
+                <ul class="list">
+                  <li>投放節奏：4–6 週品牌 burst → 週週意圖收單 → 跨螢追投補轉化。</li>
+                  <li>每週檢視：Reach / Time Spent / Leads / CPL / 有效名單率（+ 若有到店）。</li>
+                  <li>建立「素材 × 受眾 × 版位」三軸優化表，做迭代決策。</li>
+                </ul>
+                <div class="imp"><b>交付物</b>：週報（含洞察與下一步），月報（含策略調整與 ROI 評估）。</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ===================== Appendix ===================== -->
+    <section class="section" id="sec-appendix">
+      <details id="details-appendix" data-persist>
+        <summary aria-label="展開/收合：附錄">
+          <div class="section-title">
+            <span class="badge">Appendix</span>
+            <h2>附錄：原文、術語表、備註</h2>
+          </div>
+          <div class="chev" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+
+        <div class="section-body">
+          <div class="grid">
+            <div class="col-12">
+              <div class="card">
+                <h3>術語表（Glossary）</h3>
+                <table class="table" aria-label="術語表">
+                  <thead>
+                    <tr>
+                      <th style="width:20%;">術語</th>
+                      <th>說明</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><b>Reimagine</b></td>
+                      <td>Jaguar 母公司 JLR 的品牌重塑/電動化轉型策略（原文引用）。</td>
+                    </tr>
+                    <tr>
+                      <td><b>EV</b></td>
+                      <td>純電動車（Electric Vehicle）。</td>
+                    </tr>
+                    <tr>
+                      <td><b>Lead</b></td>
+                      <td>名單（例如試駕預約），需進一步定義「有效名單」條件。</td>
+                    </tr>
+                    <tr>
+                      <td><b>CPL</b></td>
+                      <td>Cost Per Lead：每筆名單成本。高單價品類需同看「有效率/到店率」。</td>
+                    </tr>
+                    <tr>
+                      <td><b>SOV / SOV(搜尋)</b></td>
+                      <td>Share of Voice：聲量份額。需明確定義平台、期間與計算方式，否則會誤用。</td>
+                    </tr>
+                    <tr>
+                      <td><b>VTR</b></td>
+                      <td>Video Through Rate：影音觀看/完播率（不同定義需對齊）。</td>
+                    </tr>
+                    <tr>
+                      <td><b>跨螢</b></td>
+                      <td>跨裝置/跨螢幕投放與頻次管理（PC/手機/CTV 等）。</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="callout note">
+                <div class="title"><span>來源註記（重要）</span><span class="badge info">內部核對用</span></div>
+                <p>
+                  原文中出現的括號型引用（例如「【…†L…】」）為深度研究階段的來源標記格式。
+                  本頁保留其精神但不保證所有引用在離線環境可直接追溯。若要對外提案或做高風險承諾，
+                  請務必回到原始資料（官網/報告/新聞報導）逐條核對。
+                </p>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="card">
+                <h3>原文（deep research）保留</h3>
+                <p class="kicker">以下為「上方 deep research 文字報告」的保留版本（為離線可用與可查核，已原樣貼入）。</p>
+
+                <div class="mono" aria-label="原文內容">
+【Executive Summary】 Jaguar（捷豹）在台灣屬小眾英倫豪華汽車品牌，近年全球推行「Reimagine」轉型戰略，強調純電動化與品牌重塑。然而本地市場對其「英倫豪華、設計美學、性能血統」等定位認知有限，與德系主流豪華品牌相比存在落差。同時，Jaguar 在台產品線精簡、電動車形象不鮮明，導致銷量與市佔表現低迷（推測台灣年銷量僅佔豪車市場極小比例）。主要行銷痛點包括：品牌知名度與形象斷層、競品夾擊下的定位模糊、電動化溝通不足，以及試乘體驗轉化困難。為此，建議聚焦 3–5 個溝通主軸：透過強調 Jaguar 電動性能與設計傳承、營造英倫豪華生活風格、提供沉浸式試駕體驗等策略，結合 Yahoo 奇摩多元媒體資源（首頁、原生內容、影音、跨螢精準投放、內容共創等），全方位強化「Jaguar 電動新紀元」印象並有效帶動試駕預約轉化。
+【1. 客戶背景（Client Background）】
+* 全球定位與 Reimagine：英倫豪華、設計、性能、電動化；品牌識別更新；「Copy Nothing」。
+* 台灣產品線與價位：F-Pace、E-Pace、F-Type、I-Pace；約 280–500+ 萬；I-Pace 約 298 萬（需核對）。
+* 目標族群（推測）：35–55 高資產、品味導向；部分年輕新貴 30–45；重視差異化與圈層。
+* 市場表現：台灣缺乏可靠公開數據 → 資料不足，以質化判斷替代。
+* 行銷操作：偏品牌調性；利基媒體；需要加強在地化訊息與試駕轉化。
+【2. 行銷難題（Marketing Challenges）】
+1. 品牌認知斷層：過往形象 vs 新定位
+2. 競品強勢壓制：定位模糊、存在感不足
+3. 電動化形象薄弱：科技信任未建立
+4. 試駕轉化困難：體驗/流程/回拋未閉環
+【3. 行銷切入點與 Yahoo 機會（Angles & Yahoo Opportunities）】 主軸一：重塑英倫電動奢華 – 「Jaguar 全電新紀元」
+* Yahoo：首頁＋新聞原生＋影音＋品牌專題＋跨平台導流
+* KPI：曝光、閱讀時間、完播、品牌認知
+主軸二：聚焦獨特價值 – 「與其人云亦云，不如駕馭非凡」
+* Yahoo：興趣/意圖定向＋論壇話題＋內容共創＋跨螢
+* KPI：互動、意向、導流、站內搜尋量/關鍵字
+主軸三：體驗性能與創新 – 「試駕Jaguar，電驅激情零距離」
+* Yahoo：CTA廣告＋站內表單/落地頁＋跨螢提醒＋影音直播互動
+* KPI：試駕預約、有效名單、到店率、成交（需回拋）
+（可選）主軸四：社群口碑 – 「Jaguar菁英車主圈，共創新聲量」
+* Yahoo：Line社群、論壇車主專區、內容共創、活動報導
+* KPI：社群活躍、口碑、轉介紹（中長期）
+【4. Takeaways】
+* 英倫豪華 × 電動創新雙定位
+* 避開同質化競爭，訴求獨特品味
+* 以數位體驗驅動實體轉化（試駕）
+* 整合 Yahoo 生態，放大在地聲量
+* 數據驅動與KPI明確（需補資料/回拋） </div> <div class="imp"> <b>所以呢？</b> <span class="muted">附錄保留原文是為了：當內部對某個結論有疑慮時，可以回到原始敘事檢查是否「過度推論」或「資料不足」。</span> </div> </div> </div>         </div>
+      </div>
+    </details>
+  </section>
+</main>
+
+<div class="footer">
+  <p>
+    本頁為離線單檔 HTML，可直接儲存使用。若要對外提案或承諾 KPI，請先完成「待補資料清單」並核對原始來源。
+  </p>
+</div>
+
+<div class="backtotop" id="backToTop">
+  <button class="btn primary" aria-label="回到頂部">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 5l7 7M12 5l-7 7M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    回到頂部
+  </button>
+</div>
+</div> </div> <script> // ========================= // Utilities // ========================= const $ = (sel, root=document) => root.querySelector(sel); const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel)); function formatDateZH(d){ // yyyy-mm-dd const yyyy = d.getFullYear(); const mm = String(d.getMonth()+1).padStart(2,'0'); const dd = String(d.getDate()).padStart(2,'0'); return `${yyyy}-${mm}-${dd}`; } function slugify(text){ return text .toLowerCase() .trim() .replace(/[^\u4e00-\u9fa5a-z0-9\s-]/g, '') // keep zh + alnum .replace(/\s+/g, '-') .replace(/-+/g, '-') .slice(0, 60) || ('sec-' + Math.random().toString(16).slice(2)); } function openParentDetails(el){ const det = el.closest('details'); if(det && !det.open) det.open = true; } // ========================= // Date // ========================= (function initDate(){ const d = new Date(); $('#genDate').textContent = formatDateZH(d); })(); // ========================= // Sidebar: collapse & mobile drawer // ========================= const sidebar = $('#sidebar'); const toggleSidebarBtn = $('#toggleSidebarBtn'); const openSidebarMobile = $('#openSidebarMobile'); const closeSidebarMobile = $('#closeSidebarMobile'); function setSidebarCollapsed(collapsed){ sidebar.classList.toggle('is-collapsed', collapsed); localStorage.setItem('yahoo_internal_sidebar_collapsed', collapsed ? '1' : '0'); } function setSidebarOpen(open){ sidebar.classList.toggle('open', open); } toggleSidebarBtn.addEventListener('click', () => { const collapsed = sidebar.classList.contains('is-collapsed'); setSidebarCollapsed(!collapsed); }); if(openSidebarMobile){ openSidebarMobile.addEventListener('click', () => setSidebarOpen(true)); } if(closeSidebarMobile){ closeSidebarMobile.addEventListener('click', () => setSidebarOpen(false)); } // restore (function restoreSidebar(){ const saved = localStorage.getItem('yahoo_internal_sidebar_collapsed'); if(saved === '1') setSidebarCollapsed(true); })(); // close sidebar when clicking outside on mobile document.addEventListener('click', (e) => { const isMobile = window.matchMedia('(max-width: 980px)').matches; if(!isMobile) return; if(!sidebar.classList.contains('open')) return; const withinSidebar = sidebar.contains(e.target); const withinOpenBtn = openSidebarMobile && openSidebarMobile.contains(e.target); if(!withinSidebar && !withinOpenBtn){ setSidebarOpen(false); } }); // ========================= // Details: persist open state // ========================= (function persistDetails(){ $$('details[data-persist]').forEach(det => { const key = 'yahoo_internal_details_' + (det.id || slugify(det.textContent.slice(0,24))); // restore const saved = localStorage.getItem(key); if(saved === 'open') det.open = true; if(saved === 'closed') det.open = false; det.addEventListener('toggle', () => { localStorage.setItem(key, det.open ? 'open' : 'closed'); }); }); })(); // Expand / Collapse All $('#expandAllBtn').addEventListener('click', () => { $$('details[data-persist]').forEach(d => d.open = true); }); $('#collapseAllBtn').addEventListener('click', () => { $$('details[data-persist]').forEach(d => { // keep Executive Summary open for usability if(d.id === 'details-exec') return; d.open = false; }); }); // ========================= // TOC: Auto generate from H2/H3 // ========================= const main = $('#main'); const toc = $('#toc'); const readingNav = $('#readingNav'); function buildTOC(){ toc.innerHTML = ''; const headings = $$('h2, h3', main); // ensure IDs headings.forEach(h => { if(!h.id){ h.id = slugify(h.textContent); } }); // build TOC list headings.forEach(h => { // skip tiny headings inside cards? (still useful) const level = h.tagName.toLowerCase(); const item = document.createElement('a'); item.href = '#' + h.id; item.className = 'toc-item level-' + level; item.dataset.target = h.id; const dot = document.createElement('span'); dot.className = 'dot'; const text = document.createElement('span'); text.className = 'text'; const title = document.createElement('div'); title.textContent = h.textContent.trim(); // small subtitle: parent section if h3 if(level === 'h3'){ const parentH2 = h.closest('.section')?.querySelector('h2'); const small = document.createElement('small'); small.textContent = parentH2 ? parentH2.textContent.trim() : '子節'; text.appendChild(title); text.appendChild(small); }else{ text.appendChild(title); } item.appendChild(dot); item.appendChild(text); item.addEventListener('click', (e) => { // open collapsed details containing the heading const target = $('#' + h.id); if(target) openParentDetails(target); // close sidebar on mobile after click if(window.matchMedia('(max-width: 980px)').matches){ setSidebarOpen(false); } }); toc.appendChild(item); }); // build header reading nav chips using top-level H2 (first 6) readingNav.innerHTML = ''; const topH2 = headings.filter(h => h.tagName.toLowerCase() === 'h2').slice(0, 6); topH2.forEach(h => { const chip = document.createElement('a'); chip.className = 'chip'; chip.href = '#' + h.id; chip.textContent = h.textContent.trim(); chip.addEventListener('click', () => openParentDetails(h)); readingNav.appendChild(chip); }); // highlight active section on scroll const observer = new IntersectionObserver((entries) => { // pick the most visible heading const visible = entries .filter(en => en.isIntersecting) .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0]; if(!visible) return; const id = visible.target.id; $$('.toc-item', toc).forEach(a => a.classList.toggle('active', a.dataset.target === id)); }, { root: null, threshold: [0.25, 0.5, 0.8] }); headings.forEach(h => observer.observe(h)); } buildTOC(); // ========================= // Search: highlight matches + count + prev/next // ========================= const searchInput = $('#searchInput'); const clearSearchBtn = $('#clearSearchBtn'); const searchCount = $('#searchCount'); const prevHitBtn = $('#prevHitBtn'); const nextHitBtn = $('#nextHitBtn'); let hits = []; let activeHitIndex = -1; function clearHighlights(){ // unwrap marks const marks = $$('mark.search-hit', main); marks.forEach(m => { const text = document.createTextNode(m.textContent); m.replaceWith(text); }); hits = []; activeHitIndex = -1; updateSearchMeta(); } function updateSearchMeta(){ const total = hits.length; if(total === 0){ searchCount.textContent = '命中：0'; }else{ searchCount.textContent = `命中：${activeHitIndex+1}/${total}`; } } function highlightQuery(query){ clearHighlights(); if(!query) return; const q = query.trim(); if(q.length === 0) return; // NodeIterator over text nodes (fast enough for single-page) const iterator = document.createNodeIterator( main, NodeFilter.SHOW_TEXT, { acceptNode(node){ if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT; const parent = node.parentElement; if(!parent) return NodeFilter.FILTER_REJECT; // Ignore script/style if(parent.closest('script, style')) return NodeFilter.FILTER_REJECT; return NodeFilter.FILTER_ACCEPT; } } ); const qLower = q.toLowerCase(); let node; while((node = iterator.nextNode())){ const text = node.nodeValue; const textLower = text.toLowerCase(); if(!textLower.includes(qLower)) continue; const frag = document.createDocumentFragment(); let start = 0; while(true){ const idx = textLower.indexOf(qLower, start); if(idx === -1) break; // before match if(idx > start){ frag.appendChild(document.createTextNode(text.slice(start, idx))); } // match const mark = document.createElement('mark'); mark.className = 'search-hit'; mark.textContent = text.slice(idx, idx + q.length); frag.appendChild(mark); hits.push(mark); start = idx + q.length; } // after last match if(start < text.length){ frag.appendChild(document.createTextNode(text.slice(start))); } node.parentNode.replaceChild(frag, node); } if(hits.length){ activeHitIndex = 0; focusHit(activeHitIndex, { smooth: true }); }else{ activeHitIndex = -1; } updateSearchMeta(); } function focusHit(index, opts={smooth:false}){ if(!hits.length) return; activeHitIndex = (index + hits.length) % hits.length; hits.forEach((m,i) => m.classList.toggle('active', i === activeHitIndex)); const active = hits[activeHitIndex]; // ensure parent details open openParentDetails(active); active.scrollIntoView({ behavior: opts.smooth ? 'smooth' : 'auto', block: 'center' }); updateSearchMeta(); } let searchDebounce = null; searchInput.addEventListener('input', () => { const q = searchInput.value; if(searchDebounce) clearTimeout(searchDebounce); searchDebounce = setTimeout(() => highlightQuery(q), 80); }); clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; clearHighlights(); searchInput.focus(); }); prevHitBtn.addEventListener('click', () => focusHit(activeHitIndex - 1, { smooth:true })); nextHitBtn.addEventListener('click', () => focusHit(activeHitIndex + 1, { smooth:true })); // ========================= // Back to top // ========================= const backToTop = $('#backToTop'); backToTop.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' })); window.addEventListener('scroll', () => { const y = window.scrollY || document.documentElement.scrollTop; backToTop.classList.toggle('show', y > 560); }); // ========================= // Improve anchor behavior: open details when navigating to hash // ========================= window.addEventListener('hashchange', () => { const id = location.hash.replace('#',''); if(!id) return; const el = document.getElementById(id); if(el) openParentDetails(el); }); // ========================= // Accessibility / UX: ESC closes sidebar on mobile // ========================= document.addEventListener('keydown', (e) => { if(e.key === 'Escape'){ if(window.matchMedia('(max-width: 980px)').matches){ setSidebarOpen(false); } } }); </script>
+</body> </html>
